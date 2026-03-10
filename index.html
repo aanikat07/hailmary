@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FantasyMath — Probabilistic Lineup Optimizer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=IBM+Plex+Mono:wght@400;500&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div class="logo">FANTASY<span>MATH</span></div>
+  <div class="header-note">2025–26 NFL Season · PPR Scoring · MLE Distribution Fitting</div>
+</header>
+
+<div class="app">
+
+  <!-- LEFT: PLAYER POOL -->
+  <div class="player-pool">
+    <div class="panel-header">
+      <div class="panel-title">Player Pool</div>
+      <input class="search-input" type="text" placeholder="Search players..." id="searchInput" />
+      <div class="pos-filters" id="posFilters">
+        <button class="pos-btn active-ALL" data-pos="ALL">ALL</button>
+        <button class="pos-btn" data-pos="QB">QB</button>
+        <button class="pos-btn" data-pos="RB">RB</button>
+        <button class="pos-btn" data-pos="WR">WR</button>
+        <button class="pos-btn" data-pos="TE">TE</button>
+        <button class="pos-btn" data-pos="K">K</button>
+        <button class="pos-btn" data-pos="DST">DST</button>
+      </div>
+    </div>
+    <div class="player-list" id="playerList"></div>
+  </div>
+
+  <!-- CENTER: LINEUP -->
+  <div class="lineup-area">
+    <div class="lineup-title">MY LINEUP</div>
+    <div class="lineup-subtitle">Drag players from the pool into lineup slots</div>
+    <div class="lineup-slots" id="lineupSlots"></div>
+  </div>
+
+  <!-- RIGHT: DISTRIBUTION PANEL -->
+  <div class="dist-panel">
+    <div class="panel-header">
+      <div class="panel-title">Score Distribution</div>
+    </div>
+    <div class="dist-content" id="distContent">
+      <div class="empty-state">
+        <div class="empty-icon">📊</div>
+        <div class="empty-text">Add players to your lineup<br>to see the score distribution</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="data.js"></script>
+<script src="math.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
