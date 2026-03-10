@@ -19,18 +19,44 @@ let myActivePos = 'ALL', oppActivePos = 'ALL';
 let mySearch = '', oppSearch = '';
 let riskMode = 'safe'; // 'safe' | 'upside'
 let oppManualScore = null;
+let currentWeek = 18; // default to full season
 
-// Pre-compute boom probs and archetypes for all players
-const PLAYER_META = {};
-PLAYER_DATA.forEach(p => {
-  PLAYER_META[p.name] = {
-    boom: computeBoomProb(p),
-    archetype: getArchetype(p)
-  };
-});
+// Pre-compute boom probs and archetypes — recalculated when week changes
+let PLAYER_META = {};
+
+function recomputeMeta() {
+  PLAYER_META = {};
+  PLAYER_DATA.forEach(p => {
+    PLAYER_META[p.name] = {
+      boom: computeBoomProb(p, currentWeek),
+      archetype: getArchetype(p, currentWeek),
+      // Week-specific MLE params (used in dist panel and lineup stats)
+      weekMu: (() => {
+        if (currentWeek > 2) {
+          const mle = getMleAtWeek(p, currentWeek);
+          return mle ? mle.mu : p.mu;
+        }
+        return p.mu;
+      })(),
+      weekSigma: (() => {
+        if (currentWeek > 2) {
+          const mle = getMleAtWeek(p, currentWeek);
+          return mle ? mle.sigma : p.sigma;
+        }
+        return p.sigma;
+      })(),
+      actualScore: getActualScore(p, currentWeek)
+    };
+  });
+}
 
 function shortName(name) { return name.replace(/\s*\([^)]*\)/, ''); }
-function getPlayers(lineup) { return Object.values(lineup).filter(Boolean); }
+function getPlayers(lineup) {
+  return Object.values(lineup).filter(Boolean).map(p => {
+    const meta = PLAYER_META[p.name];
+    return { ...p, mu: meta ? meta.weekMu : p.mu, sigma: meta ? meta.weekSigma : p.sigma };
+  });
+}
 
 function boomColor(prob) {
   if (prob >= 0.35) return '#00e5a0';
@@ -67,6 +93,9 @@ function renderPool(side) {
     const boom = meta.boom;
     const arch = meta.archetype;
     const inL = inLineup.has(player.name);
+    const wmu = meta.weekMu.toFixed(1);
+    const wsigma = meta.weekSigma.toFixed(1);
+    const actual = meta.actualScore;
 
     const card = document.createElement('div');
     card.className = `player-card pos-${player.position}${inL ? ' in-lineup' : ''}`;
@@ -83,9 +112,10 @@ function renderPool(side) {
         </div>
       </div>
       <div class="card-row2">
-        <span class="card-stat">μ <span>${player.mu}</span></span>
-        <span class="card-stat">σ <span>${player.sigma}</span></span>
-        <span class="card-stat">n=<span>${player.weeks}</span></span>
+        <span class="card-stat">μ <span>${wmu}</span></span>
+        <span class="card-stat">σ <span>${wsigma}</span></span>
+        <span class="card-stat">n=<span>${Math.min(currentWeek - 1, player.weeks)}</span></span>
+        ${actual !== null ? `<span class="card-stat actual-score">Wk${currentWeek}: <span style="color:${actual > parseFloat(wmu) ? '#00e5a0' : '#ff4757'}">${actual}</span></span>` : ''}
       </div>
       <canvas class="mini-dist" id="mini-${side}-${player.name.replace(/\W/g,'_')}"></canvas>
     `;
@@ -100,7 +130,7 @@ function renderPool(side) {
 
     requestAnimationFrame(() => {
       const c = document.getElementById(`mini-${side}-${player.name.replace(/\W/g,'_')}`);
-      if (c) drawMiniDist(c, player.mu, player.sigma, POS_COLORS[player.position]);
+      if (c) drawMiniDist(c, meta.weekMu, meta.weekSigma, POS_COLORS[player.position]);
     });
   });
 }
@@ -124,11 +154,14 @@ function renderLineupSlots(side) {
 
     if (player) {
       const meta = PLAYER_META[player.name];
+      const wmu = meta.weekMu.toFixed(1);
+      const wsigma = meta.weekSigma.toFixed(1);
+      const actual = meta.actualScore;
       el.innerHTML += `
         <div class="slot-player">
           <div class="slot-player-info">
             <div class="slot-player-name">${shortName(player.name)}</div>
-            <div class="slot-player-sub">μ=${player.mu} · σ=${player.sigma} · <span style="color:${boomColor(meta.boom)}">${boomLabel(meta.boom)} ${(meta.boom*100).toFixed(0)}%</span></div>
+            <div class="slot-player-sub">μ=${wmu} · σ=${wsigma} · <span style="color:${boomColor(meta.boom)}">${boomLabel(meta.boom)} ${(meta.boom*100).toFixed(0)}%</span>${actual !== null ? ` · <span style="color:${actual > parseFloat(wmu) ? '#00e5a0' : '#ff4757'}">actual: ${actual}</span>` : ''}</div>
           </div>
           <canvas class="slot-dist" id="slot-dist-${side}-${slot.id}"></canvas>
           <button class="remove-btn" data-slot="${slot.id}" data-side="${side}">×</button>
@@ -161,7 +194,8 @@ function renderLineupSlots(side) {
       const player = lineup[slot.id];
       if (player) {
         const c = document.getElementById(`slot-dist-${side}-${slot.id}`);
-        if (c) drawMiniDist(c, player.mu, player.sigma, POS_COLORS[slot.label] || POS_COLORS[player.position]);
+        const meta = PLAYER_META[player.name];
+        if (c) drawMiniDist(c, meta.weekMu, meta.weekSigma, POS_COLORS[slot.label] || POS_COLORS[player.position]);
       }
     });
     document.querySelectorAll('.remove-btn').forEach(btn => {
@@ -506,5 +540,17 @@ function setupFilters(side) {
 setupFilters('my');
 setupFilters('opp');
 
+// ── Week Selector ─────────────────────────────────────────────
+document.getElementById('weekBtns').addEventListener('click', e => {
+  const btn = e.target.closest('.week-btn');
+  if (!btn) return;
+  currentWeek = parseInt(btn.dataset.week);
+  document.querySelectorAll('.week-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  recomputeMeta();
+  renderAll();
+});
+
 // ── Init ─────────────────────────────────────────────────────
+recomputeMeta();
 renderAll();

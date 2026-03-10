@@ -29,12 +29,44 @@ function mleSigma(scores) {
   return Math.sqrt(variance);
 }
 
+// Get MLE params using only data up to (but not including) the target week
+// Returns {mu, sigma, scores} based on prior weeks only
+function getMleAtWeek(player, targetWeek) {
+  const priorScores = [];
+  for (let w = 1; w < targetWeek; w++) {
+    const s = player.week_scores[String(w)];
+    if (s !== undefined) priorScores.push(s);
+  }
+  if (priorScores.length < 2) return null;
+  const mu = mleMean(priorScores);
+  const sigma = Math.max(0.1, mleSigma(priorScores));
+  return { mu, sigma, scores: priorScores };
+}
+
+// Get actual score for a given week (or null if didn't play)
+function getActualScore(player, week) {
+  const s = player.week_scores[String(week)];
+  return s !== undefined ? s : null;
+}
+
 // E[T] = sum(mu_i), Var[T] = sum(sigma_i^2), T ~ Normal by CLT
-function getLineupStats(players) {
+// If targetWeek provided, uses MLE params from prior weeks only
+function getLineupStats(players, targetWeek) {
   if (!players || players.length === 0) return null;
-  const mu = players.reduce((s, p) => s + p.mu, 0);
-  const variance = players.reduce((s, p) => s + p.sigma * p.sigma, 0);
-  return { mu, sigma: Math.sqrt(variance), variance, count: players.length };
+  let totalMu = 0, totalVar = 0;
+  for (const p of players) {
+    let mu, sigma;
+    if (targetWeek && targetWeek > 2) {
+      const mle = getMleAtWeek(p, targetWeek);
+      mu = mle ? mle.mu : p.mu;
+      sigma = mle ? mle.sigma : p.sigma;
+    } else {
+      mu = p.mu; sigma = p.sigma;
+    }
+    totalMu += mu;
+    totalVar += sigma * sigma;
+  }
+  return { mu: totalMu, sigma: Math.sqrt(totalVar), variance: totalVar, count: players.length };
 }
 
 // D = T_you - T_opp ~ N(mu_you - mu_opp, sigma_you^2 + sigma_opp^2)
@@ -98,29 +130,45 @@ function rollingStd(scores, window) {
   return Math.sqrt(relevant.reduce((s, x) => s + (x - m) ** 2, 0) / relevant.length);
 }
 
-function computeBoomProb(player) {
-  const { scores, mu, sigma } = player;
+// computeBoomProb — week-aware out-of-sample prediction
+// If targetWeek provided, uses ONLY data from weeks before targetWeek (proper holdout)
+// This is genuine out-of-sample prediction: fit on weeks 1..W-1, predict week W
+function computeBoomProb(player, targetWeek) {
+  let scores, mu, sigma;
+
+  if (targetWeek && targetWeek > 2) {
+    const mle = getMleAtWeek(player, targetWeek);
+    if (!mle || mle.scores.length < 2) return 0.3; // not enough prior data
+    scores = mle.scores;
+    mu = mle.mu;
+    sigma = mle.sigma;
+  } else {
+    scores = player.scores;
+    mu = player.mu;
+    sigma = player.sigma;
+  }
+
   const n = scores.length;
   const sigma_ = sigma + 1e-9;
 
-  // Feature 1: recent form vs season mean, normalized by sigma
+  // Feature 1: recent form vs season mean (normalized)
   const rm3 = rollingMean(scores, 3);
   const recentFormNorm = (rm3 - mu) / sigma_;
 
-  // Feature 2: how far into the season (week normalized 0-1)
-  const weekNorm = n / 17.0;
+  // Feature 2: how far into the season
+  const weekNorm = (targetWeek || n) / 17.0;
 
-  // Feature 3: recent volatility ratio (recent std / season std)
+  // Feature 3: recent volatility ratio
   const rs3 = rollingStd(scores, 3);
   const recentVolRatio = rs3 / sigma_;
 
   // Feature 4: cold last week (binary)
   const cold = scores[n - 1] < mu * 0.7 ? 1.0 : 0.0;
 
-  // Feature 5: momentum (last week change, sigma-normalized)
+  // Feature 5: momentum
   const momentum = n >= 2 ? (scores[n - 1] - scores[n - 2]) / sigma_ : 0;
 
-  // Feature 6: coefficient of variation (consistency measure)
+  // Feature 6: coefficient of variation
   const cv = sigma_ / (mu + 1e-9);
 
   const raw = [recentFormNorm, weekNorm, recentVolRatio, cold, momentum, cv];
@@ -129,13 +177,21 @@ function computeBoomProb(player) {
   return sigmoid(z);
 }
 
-// Classify player archetype based on CV and zero-game rate
-function getArchetype(player) {
-  const cv = player.sigma / (player.mu + 1e-9);
-  const zeroRate = player.scores.filter(s => s === 0).length / player.scores.length;
-  if (zeroRate > 0.2)  return { label: "INJURY RISK",    color: "#ff4d6d" };
-  if (cv < 0.4)        return { label: "FLOOR MONSTER",  color: "#00e5a0" };
-  if (cv > 0.8)        return { label: "BOOM/BUST",      color: "#ff6b35" };
-  if (cv < 0.6)        return { label: "CONSISTENT",     color: "#4d9fff" };
-  return                { label: "BALANCED",             color: "#ffd166" };
+// Classify player archetype — week-aware if targetWeek provided
+function getArchetype(player, targetWeek) {
+  let mu, sigma, scores;
+  if (targetWeek && targetWeek > 2) {
+    const mle = getMleAtWeek(player, targetWeek);
+    if (mle) { mu = mle.mu; sigma = mle.sigma; scores = mle.scores; }
+    else { mu = player.mu; sigma = player.sigma; scores = player.scores; }
+  } else {
+    mu = player.mu; sigma = player.sigma; scores = player.scores;
+  }
+  const cv = sigma / (mu + 1e-9);
+  const zeroRate = scores.filter(s => s === 0).length / scores.length;
+  if (zeroRate > 0.2)  return { label: "INJURY RISK",   color: "#ff4d6d" };
+  if (cv < 0.4)        return { label: "FLOOR MONSTER", color: "#00e5a0" };
+  if (cv > 0.8)        return { label: "BOOM/BUST",     color: "#ff6b35" };
+  if (cv < 0.6)        return { label: "CONSISTENT",    color: "#4d9fff" };
+  return                { label: "BALANCED",            color: "#ffd166" };
 }
