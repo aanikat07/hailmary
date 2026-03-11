@@ -132,7 +132,7 @@ header {
 /* ── APP LAYOUT ───────────────────────────────────────────── */
 .app-layout {
   display: grid;
-  grid-template-columns: 300px 1fr 360px;
+  grid-template-columns: 320px 1fr 360px;
   flex: 1; overflow: hidden;
 }
 
@@ -196,6 +196,7 @@ header {
   border-radius: 8px; padding: 9px 10px 7px 13px;
   cursor: grab; transition: border-color 0.12s, transform 0.12s;
   user-select: none; position: relative; overflow: hidden;
+  color: #e8eaf0;
 }
 .player-card::before {
   content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
@@ -221,8 +222,8 @@ header {
   display: flex; align-items: center; justify-content: space-between; gap: 6px; width: 100%;
 }
 .card-name {
-  font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 14px;
-  color: var(--text);
+  font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 13px;
+  color: #e8eaf0 !important;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   flex: 1; min-width: 0;
 }
