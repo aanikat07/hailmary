@@ -570,9 +570,15 @@ function renderBattle() {
     <div class="diff-dist-section">
       <div class="section-label" style="margin-bottom:8px">SCORE DIFFERENTIAL — D = T_you − T_opp</div>
       <canvas id="diff-canvas" style="height:120px"></canvas>
-      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:6px;line-height:1.7">
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;line-height:1.9">
         D ~ N(${mu_D.toFixed(1)}, ${sigma_D.toFixed(1)}²) = N(μ_you−μ_opp, σ²_you+σ²_opp)<br>
-        <span style="color:#00e5a0">Green = P(you win) = ${wp.toFixed(1)}%</span> · <span style="color:#4da6ff">Blue = P(opp wins) = ${(100-wp).toFixed(1)}%</span>
+        <span style="color:#00e5a0">■ Green = P(you win) = ${wp.toFixed(1)}%</span> · <span style="color:#4da6ff">■ Blue = P(opp wins) = ${(100-wp).toFixed(1)}%</span>
+      </div>
+      <div style="margin-top:10px;padding:12px 14px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);line-height:2.0">
+        <div style="color:var(--text);font-weight:700;letter-spacing:1px;margin-bottom:6px">HOW TO READ THIS CURVE</div>
+        This curve models the distribution of all possible <em>score differences</em> between your lineup and theirs on game day. It is derived from the Central Limit Theorem: since each player's score is modeled as N(μ, σ²), the sum of a lineup is also normal, and the difference of two normals is itself normal with μ = μ_you − μ_opp and σ² = σ²_you + σ²_opp.<br><br>
+        <span style="color:#00e5a0">■ Green area</span> = outcomes where you win (D &gt; 0). <span style="color:#4da6ff">■ Blue area</span> = outcomes where they win (D &lt; 0). The <strong style="color:var(--text)">dashed vertical line</strong> at x=0 is the win/loss threshold.<br><br>
+        A <strong style="color:var(--text)">wider curve</strong> means more combined variance — even if your expected edge is positive, a lot of the curve still bleeds left, meaning upsets are common. A <strong style="color:var(--text)">narrow curve</strong> means both rosters are consistent and the outcome is more deterministic. When you're the underdog (curve centered left of 0), you want <em>high variance</em> — it's your only path to an upset.
       </div>
     </div>
 
@@ -587,6 +593,33 @@ function renderBattle() {
       <div class="section-label" style="margin-bottom:10px">POSITION MATCHUPS · WK ${currentWeek}</div>
       <div class="matchups-grid" id="matchupsGrid">
         ${sortedMatchups.map((m, idx) => renderMatchupCard(m, idx)).join('')}
+      </div>
+    </div>
+
+    <div style="margin-top:18px;padding:14px 16px;background:rgba(255,255,255,0.025);border:1px solid var(--border);border-radius:10px;font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);line-height:2.1">
+      <div style="color:var(--text);font-weight:700;letter-spacing:1px;margin-bottom:10px">INTERPRETING ARCHETYPES &amp; BOOM PROBABILITY</div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 20px;">
+        <div>
+          <div style="color:#ffd166;font-weight:700;margin-bottom:3px">BOOM/BUST</div>
+          High ceiling, high floor variance. These players have big upside weeks but also goose-egg risk. Boom% will typically be elevated (&gt;35%). Use them when you need points — risky in safe-mode weeks.
+        </div>
+        <div>
+          <div style="color:#00e5a0;font-weight:700;margin-bottom:3px">CONSISTENT</div>
+          Low σ relative to μ. These players show up every week near their average. Boom% is typically lower (&lt;25%) but their floor is reliable. The backbone of a safe-mode lineup.
+        </div>
+        <div>
+          <div style="color:#f87171;font-weight:700;margin-bottom:3px">INJURY RISK</div>
+          Played in fewer than 60% of games this season. Their μ and σ are estimated from a thin sample — projections carry more uncertainty than normal. Factor in game-time decisions.
+        </div>
+        <div>
+          <div style="color:#a78bfa;font-weight:700;margin-bottom:3px">FLOOR MONSTER</div>
+          High μ relative to σ — elite production with low bust risk. These are the best starts in safe-mode: you nearly always get close to their projection. Think workhorse RBs or dominant TEs.
+        </div>
+        <div style="grid-column:1/-1">
+          <div style="color:var(--text);font-weight:700;margin-bottom:3px">BOOM % — what it means</div>
+          Boom probability is estimated via logistic regression on 6 features: current μ, σ, opponent defensive rank, recent trend, position, and games played. It represents the model's estimated probability that the player scores <strong style="color:var(--text)">≥ 1.5× their seasonal μ</strong> this week. A 40% boom means roughly 2-in-5 chance of a standout performance. Use this to compare upside between two similar-μ players when you need a ceiling play.
+        </div>
       </div>
     </div>` : ''}
   `;
