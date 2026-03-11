@@ -126,21 +126,21 @@ header {
 }
 
 /* ── TAB PANELS ───────────────────────────────────────────── */
-.tab-panel { display: none; flex: 1; overflow: hidden; }
+.tab-panel { display: none; flex: 1; min-height: 0; }
 .tab-panel.active { display: flex; flex-direction: column; }
 
 /* ── APP LAYOUT ───────────────────────────────────────────── */
 .app-layout {
   display: grid;
-  grid-template-columns: 320px 1fr 360px;
-  flex: 1; overflow: hidden;
+  grid-template-columns: 360px 1fr 360px;
+  flex: 1; min-height: 0;
 }
 
 /* ── PLAYER POOL (left) ───────────────────────────────────── */
 .player-pool {
   background: var(--surface);
   border-right: 2px solid var(--border);
-  display: flex; flex-direction: column; overflow: hidden;
+  display: flex; flex-direction: column; min-height: 0;
 }
 .opp-pool {
   background: #090c14;
@@ -186,17 +186,20 @@ header {
 .pos-btn.active-K   { background: var(--k);    color: #000; border-color: var(--k); }
 .pos-btn.active-DST { background: var(--dst);  color: #000; border-color: var(--dst); }
 
-.player-list { flex: 1; overflow-y: auto; padding: 6px; display: flex; flex-direction: column; gap: 4px; }
+.player-list { flex: 1; overflow-y: auto; padding: 6px; display: flex; flex-direction: column; gap: 6px; align-items: stretch; }
 .player-list::-webkit-scrollbar { width: 3px; }
 .player-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
 /* ── PLAYER CARDS ─────────────────────────────────────────── */
 .player-card {
-  background: var(--surface2); border: 1.5px solid var(--border);
-  border-radius: 8px; padding: 9px 10px 7px 13px;
+  background: #1e2130; border: 1.5px solid #252836;
+  border-radius: 8px; padding: 10px 12px 10px 14px;
   cursor: grab; transition: border-color 0.12s, transform 0.12s;
-  user-select: none; position: relative; overflow: hidden;
-  color: #e8eaf0;
+  user-select: none; position: relative;
+  color: #f0f2f8;
+  flex-shrink: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 .player-card::before {
   content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
@@ -227,7 +230,7 @@ header {
 .card-name {
   font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 14px;
   color: #f0f2f8 !important;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  white-space: normal; word-break: break-word; line-height: 1.3;
 }
 .card-team {
   font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 700;
@@ -346,7 +349,7 @@ header {
 .dist-panel {
   background: var(--surface);
   border-left: 2px solid var(--border);
-  display: flex; flex-direction: column; overflow: hidden;
+  display: flex; flex-direction: column; min-height: 0;
 }
 .opp-dist-panel {
   background: #09090f;

@@ -269,27 +269,26 @@ function renderPool(side) {
       : `<span class="card-matchup card-matchup-bye">BYE</span>`;
 
     card.innerHTML = `
-      <div class="card-row1" style="display:flex;flex-direction:column;gap:4px;margin-bottom:4px">
-        <div class="card-name-row" style="display:flex;align-items:center;justify-content:space-between;gap:6px">
-          <div style="display:flex;align-items:baseline;gap:5px;flex:1;min-width:0;overflow:hidden">
-            <span style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:14px;color:#f0f2f8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${shortName(player.name)}</span>
-            <span style="font-family:'DM Mono',monospace;font-size:10px;font-weight:700;color:#7a829e;flex-shrink:0">${team}</span>
+      <div style="margin-bottom:6px">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px;margin-bottom:5px">
+          <div style="flex:1;min-width:0">
+            <div style="font-family:'DM Sans',Arial,sans-serif;font-weight:700;font-size:14px;color:#f0f2f8;line-height:1.3;word-break:break-word;white-space:normal">${shortName(player.name)}</div>
+            <div style="font-family:'Courier New',monospace;font-size:10px;color:#7a829e;margin-top:1px">${team} · ${player.position}</div>
           </div>
           ${matchupHtml}
         </div>
         <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center">
-          <span style="font-family:'DM Mono',monospace;font-size:9px;padding:2px 5px;border-radius:3px;background:${arch.color}22;color:${arch.color}">${arch.label}</span>
-          <span style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 6px;border-radius:3px;font-weight:600;background:${boomColor(boom)}22;color:${boomColor(boom)}">${boomLabel(boom)}</span>
-          <span style="font-family:'DM Mono',monospace;font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:${POS_COLORS[player.position]}22;color:${POS_COLORS[player.position]}">${player.position}</span>
+          <span style="font-family:'Courier New',monospace;font-size:9px;padding:2px 5px;border-radius:3px;background:${arch.color}22;color:${arch.color}">${arch.label}</span>
+          <span style="font-family:'Courier New',monospace;font-size:9px;padding:2px 5px;border-radius:3px;font-weight:600;background:${boomColor(boom)}22;color:${boomColor(boom)}">${boomLabel(boom)}</span>
         </div>
       </div>
-      <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">
-        <span style="font-family:'DM Mono',monospace;font-size:11px;color:#7a829e">μ <span style="color:#f0f2f8;font-weight:600">${wmu}</span></span>
-        <span style="font-family:'DM Mono',monospace;font-size:11px;color:#7a829e">σ <span style="color:#f0f2f8;font-weight:600">${wsigma}</span></span>
-        <span style="font-family:'DM Mono',monospace;font-size:11px;color:#7a829e">n=<span style="color:#f0f2f8;font-weight:600">${priorN}</span></span>
-        ${actual !== null ? `<span style="font-family:'DM Mono',monospace;font-size:10px;color:#7a829e;margin-left:auto">Wk${currentWeek}: <span style="color:${actual > parseFloat(wmu) ? '#00e5a0' : '#f87171'};font-weight:600">${actual}</span></span>` : ''}
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span style="font-family:'Courier New',monospace;font-size:11px;color:#7a829e">μ <b style="color:#f0f2f8">${wmu}</b></span>
+        <span style="font-family:'Courier New',monospace;font-size:11px;color:#7a829e">σ <b style="color:#f0f2f8">${wsigma}</b></span>
+        <span style="font-family:'Courier New',monospace;font-size:11px;color:#7a829e">n=<b style="color:#f0f2f8">${priorN}</b></span>
+        ${actual !== null ? `<span style="font-family:'Courier New',monospace;font-size:10px;color:#7a829e;margin-left:auto">Wk${currentWeek}: <b style="color:${actual > parseFloat(wmu) ? '#00e5a0' : '#f87171'}">${actual}</b></span>` : ''}
       </div>
-      <canvas class="mini-dist" id="mini-${side}-${player.name.replace(/\W/g,'_')}" style="width:100%;height:22px;margin-top:5px"></canvas>
+      <canvas class="mini-dist" id="mini-${side}-${player.name.replace(/\W/g,'_')}" style="width:100%;height:20px;margin-top:6px;display:block"></canvas>
     `;
 
     card.addEventListener('dragstart', e => {
