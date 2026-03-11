@@ -107,7 +107,7 @@
     </div>
 
     <div class="lineup-area opp-lineup-area">
-      <!-- Big unmissable opponent banner -->
+      <!-- Big unmissable opponent identity banner -->
       <div class="opp-identity-banner">
         <div class="opp-identity-icon">⚔</div>
         <div>
@@ -144,9 +144,78 @@
   </div>
 </div>
 
+<!-- ══ PLAYER GUIDE ══════════════════════════════════════════ -->
+<button class="guide-btn" id="guideBtn">?</button>
+
+<div class="guide-overlay" id="guideOverlay">
+  <div class="guide-panel">
+    <div class="guide-title"><span>HAIL</span><span>MARY</span> — GUIDE</div>
+
+    <div class="guide-section">
+      <div class="guide-section-title">Positions</div>
+      <div class="guide-row"><span class="guide-badge" style="background:rgba(255,107,53,0.15);color:#ff6b35">QB</span><span class="guide-desc">Quarterback — scores via passing TDs, rushing TDs, and yardage</span></div>
+      <div class="guide-row"><span class="guide-badge" style="background:rgba(0,229,160,0.15);color:#00e5a0">RB</span><span class="guide-desc">Running Back — scores via rushing yardage, TDs, and PPR receptions</span></div>
+      <div class="guide-row"><span class="guide-badge" style="background:rgba(77,166,255,0.15);color:#4da6ff">WR</span><span class="guide-desc">Wide Receiver — scores via receiving yardage, TDs, and PPR receptions</span></div>
+      <div class="guide-row"><span class="guide-badge" style="background:rgba(201,125,255,0.15);color:#c97dff">TE</span><span class="guide-desc">Tight End — receiving yardage, TDs, and PPR receptions</span></div>
+      <div class="guide-row"><span class="guide-badge" style="background:rgba(255,209,102,0.15);color:#ffd166">K</span><span class="guide-desc">Kicker — field goals (3–5 pts by distance) and extra points</span></div>
+      <div class="guide-row"><span class="guide-badge" style="background:rgba(248,113,113,0.15);color:#f87171">DST</span><span class="guide-desc">Defense/Special Teams — sacks, INTs, TDs, and points allowed</span></div>
+      <div class="guide-row"><span class="guide-badge" style="background:rgba(77,166,255,0.15);color:#4da6ff">FLEX</span><span class="guide-desc">Flexible slot — accepts RB, WR, or TE</span></div>
+    </div>
+
+    <div class="guide-section">
+      <div class="guide-section-title">Stats on Player Cards</div>
+      <div class="guide-row"><span class="guide-badge" style="background:rgba(0,229,160,0.15);color:#00e5a0">μ</span><span class="guide-desc">Expected (mean) score — fitted via MLE on all weeks before the selected week</span></div>
+      <div class="guide-row"><span class="guide-badge" style="background:rgba(77,166,255,0.15);color:#4da6ff">σ</span><span class="guide-desc">Standard deviation — how volatile/unpredictable the player is week-to-week</span></div>
+      <div class="guide-row"><span class="guide-badge" style="background:rgba(255,209,102,0.15);color:#ffd166">n=</span><span class="guide-desc">Number of prior-week data points used for MLE fitting</span></div>
+    </div>
+
+    <div class="guide-section">
+      <div class="guide-section-title">Boom Tags</div>
+      <div class="guide-row"><span class="guide-badge" style="background:rgba(0,229,160,0.15);color:#00e5a0">🔥 BOOM</span><span class="guide-desc">High probability of exceeding their season median this week (logistic regression, 75.4% accuracy)</span></div>
+      <div class="guide-row"><span class="guide-badge" style="background:rgba(255,209,102,0.15);color:#ffd166">〜 AVG</span><span class="guide-desc">Average likelihood — no strong signal either way</span></div>
+      <div class="guide-row"><span class="guide-badge" style="background:rgba(77,166,255,0.15);color:#4da6ff">❄ COLD</span><span class="guide-desc">Low boom probability — recent form is below their own mean</span></div>
+    </div>
+
+    <div class="guide-section">
+      <div class="guide-section-title">Archetypes</div>
+      <div class="guide-row"><span class="guide-badge" style="background:rgba(0,229,160,0.15);color:#00e5a0">FLOOR MONSTER</span><span class="guide-desc">Low coefficient of variation (σ/μ &lt; 0.4) — consistent, reliable scorer</span></div>
+      <div class="guide-row"><span class="guide-badge" style="background:rgba(255,107,53,0.15);color:#ff6b35">BOOM/BUST</span><span class="guide-desc">High volatility (σ/μ &gt; 0.8) — could win or lose your week</span></div>
+      <div class="guide-row"><span class="guide-badge" style="background:rgba(77,166,255,0.15);color:#4da6ff">CONSISTENT</span><span class="guide-desc">Moderate-low volatility (σ/μ &lt; 0.6) — steady, predictable upside</span></div>
+      <div class="guide-row"><span class="guide-badge" style="background:rgba(255,209,102,0.15);color:#ffd166">BALANCED</span><span class="guide-desc">Middle of the road — some variance, some floor</span></div>
+      <div class="guide-row"><span class="guide-badge" style="background:rgba(255,77,109,0.15);color:#ff4d6d">INJURY RISK</span><span class="guide-desc">20%+ of weeks scored 0 — significant DNP or injury history</span></div>
+    </div>
+
+    <div class="guide-section">
+      <div class="guide-section-title">Defensive Rankings (Opponent Panel)</div>
+      <div class="guide-row"><span class="guide-badge" style="background:rgba(0,229,160,0.15);color:#00e5a0">EASY</span><span class="guide-desc">Defense ranks #1–5 at allowing pts to that position — great matchup</span></div>
+      <div class="guide-row"><span class="guide-badge" style="background:rgba(0,229,160,0.15);color:#00e5a0">SOFT</span><span class="guide-desc">Ranks #6–12 — still favorable</span></div>
+      <div class="guide-row"><span class="guide-badge" style="background:rgba(255,209,102,0.15);color:#ffd166">MID</span><span class="guide-desc">Ranks #13–20 — neutral matchup</span></div>
+      <div class="guide-row"><span class="guide-badge" style="background:rgba(251,146,60,0.15);color:#fb923c">HARD</span><span class="guide-desc">Ranks #21–27 — tough matchup, expect lower output</span></div>
+      <div class="guide-row"><span class="guide-badge" style="background:rgba(248,113,113,0.15);color:#f87171">LOCK</span><span class="guide-desc">Ranks #28–32 — elite defense, very tough matchup</span></div>
+    </div>
+
+    <div class="guide-section">
+      <div class="guide-section-title">Color Code</div>
+      <div class="guide-row"><span class="guide-badge" style="background:rgba(0,229,160,0.15);color:#00e5a0">GREEN</span><span class="guide-desc">Always represents YOUR team, your stats, your win region</span></div>
+      <div class="guide-row"><span class="guide-badge" style="background:rgba(77,166,255,0.15);color:#4da6ff">BLUE</span><span class="guide-desc">Always represents the OPPONENT — their stats, their lineup, their tab</span></div>
+      <div class="guide-row"><span class="guide-badge" style="background:rgba(255,209,102,0.15);color:#ffd166">GOLD</span><span class="guide-desc">Neutral — used for win probability % and the Battle screen</span></div>
+    </div>
+  </div>
+</div>
+
 <script src="data.js"></script>
 <script src="math.js"></script>
 <script src="charts.js"></script>
 <script src="app.js"></script>
+
+<script>
+  // Guide toggle
+  const guideBtn     = document.getElementById('guideBtn');
+  const guideOverlay = document.getElementById('guideOverlay');
+  guideBtn.addEventListener('click', () => guideOverlay.classList.add('open'));
+  guideOverlay.addEventListener('click', e => {
+    if (e.target === guideOverlay) guideOverlay.classList.remove('open');
+  });
+</script>
 </body>
 </html>

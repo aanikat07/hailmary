@@ -356,10 +356,28 @@ function renderDistPanel(side) {
   }
 
   content.innerHTML = `
+    <!-- DISTRIBUTION — front and center at top -->
+    <div class="dist-chart-hero">
+      <div class="section-label" style="margin-bottom:8px">SCORE DISTRIBUTION · WK ${currentWeek}</div>
+      <canvas id="main-canvas-${side}" style="height:110px"></canvas>
+      <div class="dist-chart-context">
+        T ~ N(${stats.mu.toFixed(1)}, ${stats.sigma.toFixed(1)}²) · CLT sum of ${stats.count} players<br>
+        MLE fitted on weeks 1–${currentWeek - 1} (no lookahead)
+        ${isMe ? ` · <span style="color:var(--green)">${wp.toFixed(1)}% WIN vs ${oppScore.toFixed(0)} pts</span>` : ''}
+      </div>
+    </div>
+
     <div>
       <div class="section-label">Expected Score</div>
       <div class="big-number">${stats.mu.toFixed(1)}</div>
       <div class="big-number-label">PROJECTED FANTASY POINTS · WK ${currentWeek}</div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-box"><div class="stat-box-val">${stats.sigma.toFixed(1)}</div><div class="stat-box-lbl">STD DEV σ</div></div>
+      <div class="stat-box"><div class="stat-box-val">${stats.count}/9</div><div class="stat-box-lbl">SLOTS FILLED</div></div>
+      <div class="stat-box"><div class="stat-box-val">${(stats.mu - stats.sigma).toFixed(1)}</div><div class="stat-box-lbl">FLOOR μ−σ</div></div>
+      <div class="stat-box"><div class="stat-box-val">${(stats.mu + stats.sigma).toFixed(1)}</div><div class="stat-box-lbl">CEILING μ+σ</div></div>
     </div>
 
     <div>
@@ -373,22 +391,6 @@ function renderDistPanel(side) {
         <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted)">
           95% CI: [${ci.lower.toFixed(1)}, ${ci.upper.toFixed(1)}] · width=${((ci.upper - ci.lower)).toFixed(1)} pts
         </div>
-      </div>
-    </div>
-
-    <div class="stats-grid">
-      <div class="stat-box"><div class="stat-box-val">${stats.sigma.toFixed(1)}</div><div class="stat-box-lbl">STD DEV σ</div></div>
-      <div class="stat-box"><div class="stat-box-val">${stats.count}/9</div><div class="stat-box-lbl">SLOTS FILLED</div></div>
-      <div class="stat-box"><div class="stat-box-val">${(stats.mu - stats.sigma).toFixed(1)}</div><div class="stat-box-lbl">FLOOR μ−σ</div></div>
-      <div class="stat-box"><div class="stat-box-val">${(stats.mu + stats.sigma).toFixed(1)}</div><div class="stat-box-lbl">CEILING μ+σ</div></div>
-    </div>
-
-    <div>
-      <div class="section-label">Score Distribution</div>
-      <div class="main-canvas-wrap"><canvas id="main-canvas-${side}" style="height:130px"></canvas></div>
-      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:4px;line-height:1.7">
-        T ~ N(${stats.mu.toFixed(1)}, ${stats.sigma.toFixed(1)}²) by CLT<br>
-        MLE fitted on weeks 1–${currentWeek - 1} (n = prior games only)
       </div>
     </div>
 
