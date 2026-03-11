@@ -1,126 +1,235 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hail Mary — Probabilistic Fantasy Optimizer</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HailMary – Fantasy Probability</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+<!-- HEADER -->
 <header>
-  <div class="logo">HAIL<span>MARY</span></div>
-  <nav class="tabs" id="tabs">
-    <button class="tab active" data-tab="my-lineup">YOUR LINEUP</button>
-    <button class="tab" data-tab="opp-lineup">OPPONENT</button>
-    <button class="tab tab-battle" data-tab="battle">⚡ BATTLE</button>
-  </nav>
-  <div class="header-meta">2025–26 NFL · PPR · MLE + LogReg</div>
-  <div class="week-selector">
+  <div class="logo"><span>HAIL</span><span>MARY</span></div>
+
+  <div class="tab-group">
+    <button class="tab-btn" onclick="setTab('yours', this)">YOUR LINEUP</button>
+    <button class="tab-btn active" id="tab-opponent" onclick="setTab('opponent', this)">OPPONENT</button>
+    <button class="tab-btn battle-btn" onclick="setTab('battle', this)">⚡ BATTLE</button>
+  </div>
+
+  <div class="week-group">
     <span class="week-label">WEEK</span>
-    <div class="week-btns" id="weekBtns">
-      <button class="week-btn" data-week="1">1</button>
-      <button class="week-btn" data-week="2">2</button>
-      <button class="week-btn" data-week="3">3</button>
-      <button class="week-btn" data-week="4">4</button>
-      <button class="week-btn" data-week="5">5</button>
-      <button class="week-btn" data-week="6">6</button>
-      <button class="week-btn" data-week="7">7</button>
-      <button class="week-btn" data-week="8">8</button>
-      <button class="week-btn" data-week="9">9</button>
-      <button class="week-btn" data-week="10">10</button>
-      <button class="week-btn" data-week="11">11</button>
-      <button class="week-btn" data-week="12">12</button>
-      <button class="week-btn" data-week="13">13</button>
-      <button class="week-btn" data-week="14">14</button>
-      <button class="week-btn" data-week="15">15</button>
-      <button class="week-btn" data-week="16">16</button>
-      <button class="week-btn" data-week="17">17</button>
-      <button class="week-btn active" data-week="18">18</button>
-    </div>
+    <button class="week-btn" onclick="setWeek(1,this)">1</button>
+    <button class="week-btn" onclick="setWeek(2,this)">2</button>
+    <button class="week-btn" onclick="setWeek(3,this)">3</button>
+    <button class="week-btn" onclick="setWeek(4,this)">4</button>
+    <button class="week-btn active" onclick="setWeek(5,this)">5</button>
+    <button class="week-btn" onclick="setWeek(6,this)">6</button>
+    <button class="week-btn" onclick="setWeek(7,this)">7</button>
+    <button class="week-btn" onclick="setWeek(8,this)">8</button>
+    <button class="week-btn" onclick="setWeek(9,this)">9</button>
   </div>
 </header>
 
-<!-- ── YOUR LINEUP ── -->
-<div class="tab-panel active" id="panel-my-lineup">
-  <div class="app-layout">
-    <div class="player-pool" id="my-pool-panel">
-      <div class="panel-header">
-        <div class="panel-title">PLAYER POOL</div>
-        <input class="search-input" type="text" placeholder="Search players..." id="mySearchInput" />
-        <div class="pos-filters" id="myPosFilters">
-          <button class="pos-btn active-ALL" data-pos="ALL">ALL</button>
-          <button class="pos-btn" data-pos="QB">QB</button>
-          <button class="pos-btn" data-pos="RB">RB</button>
-          <button class="pos-btn" data-pos="WR">WR</button>
-          <button class="pos-btn" data-pos="TE">TE</button>
-          <button class="pos-btn" data-pos="K">K</button>
-          <button class="pos-btn" data-pos="DST">DST</button>
+<!-- GUIDE BUTTON -->
+<button class="guide-btn" onclick="toggleGuide()" title="Player Guide">?</button>
+
+<div class="guide-panel" id="guidePanel">
+  <div class="guide-title">📖 PLAYER LABEL GUIDE</div>
+
+  <div class="guide-row">
+    <span class="tag boom">BOOM</span>
+    <span class="guide-desc">High-upside player. Strong ceiling this week (≥30% boom probability).</span>
+  </div>
+  <div class="guide-row">
+    <span class="tag bust">BUST</span>
+    <span class="guide-desc">Risky pick. Underperformance risk is elevated this week.</span>
+  </div>
+  <div class="guide-row">
+    <span class="tag cold">COLD</span>
+    <span class="guide-desc">Below historical average. Cold streak or tough matchup flagged.</span>
+  </div>
+
+  <hr class="guide-divider">
+
+  <div class="guide-row">
+    <span class="pos-badge QB">QB</span>
+    <span class="guide-desc">Quarterback — passes/rushes, scored in PPR.</span>
+  </div>
+  <div class="guide-row">
+    <span class="pos-badge RB">RB</span>
+    <span class="guide-desc">Running back — carries + receptions count.</span>
+  </div>
+  <div class="guide-row">
+    <span class="pos-badge WR">WR</span>
+    <span class="guide-desc">Wide receiver — targets & catches.</span>
+  </div>
+  <div class="guide-row">
+    <span class="pos-badge TE">TE</span>
+    <span class="guide-desc">Tight end — bonus PPR scoring in some leagues.</span>
+  </div>
+  <div class="guide-row">
+    <span class="pos-badge K">K</span>
+    <span class="guide-desc">Kicker — FG length & extra points.</span>
+  </div>
+  <div class="guide-row">
+    <span class="pos-badge DST">DST</span>
+    <span class="guide-desc">Team defense — sacks, INTs, shutout bonus.</span>
+  </div>
+
+  <hr class="guide-divider">
+
+  <div class="guide-row" style="align-items:center;">
+    <span style="font-family:Rajdhani;color:var(--green);font-size:18px;font-weight:700;flex-shrink:0;">μ</span>
+    <span class="guide-desc">Mean projected points for the week (MLE estimate).</span>
+  </div>
+  <div class="guide-row" style="align-items:center;">
+    <span style="font-family:Rajdhani;color:var(--muted);font-size:18px;font-weight:700;flex-shrink:0;">σ</span>
+    <span class="guide-desc">Standard deviation — higher = more variance/risk.</span>
+  </div>
+</div>
+
+<!-- BODY -->
+<div class="app-body">
+
+  <!-- LEFT: PLAYER POOL -->
+  <div class="player-pool">
+    <div class="panel-header">
+      <div class="panel-title">Player Pool</div>
+      <input class="search-input" type="text" placeholder="Search players..." id="searchInput" oninput="filterPlayers()">
+      <div class="position-filters">
+        <button class="pos-btn active" data-pos="ALL" onclick="filterPos('ALL',this)">ALL</button>
+        <button class="pos-btn" data-pos="QB" onclick="filterPos('QB',this)">QB</button>
+        <button class="pos-btn" data-pos="RB" onclick="filterPos('RB',this)">RB</button>
+        <button class="pos-btn" data-pos="WR" onclick="filterPos('WR',this)">WR</button>
+        <button class="pos-btn" data-pos="TE" onclick="filterPos('TE',this)">TE</button>
+        <button class="pos-btn" data-pos="K" onclick="filterPos('K',this)">K</button>
+        <button class="pos-btn" data-pos="DST" onclick="filterPos('DST',this)">DST</button>
+      </div>
+    </div>
+    <div class="player-list" id="playerList"></div>
+  </div>
+
+  <!-- CENTER: LINEUP -->
+  <div class="lineup-panel">
+    <div class="lineup-title" id="lineupTitle">Opponent's Lineup</div>
+    <div class="lineup-subtitle">Drag players from the pool into their slots</div>
+
+    <div class="slot-row">
+      <div class="slot-label QB">QB</div>
+      <div class="drop-zone" id="slot-QB" data-pos="QB" ondragover="onDragOver(event)" ondrop="onDrop(event,this)" ondragleave="onDragLeave(event)">
+        <span class="drop-placeholder">Drop QB here</span>
+      </div>
+    </div>
+    <div class="slot-row">
+      <div class="slot-label RB">RB</div>
+      <div class="drop-zone" id="slot-RB1" data-pos="RB" ondragover="onDragOver(event)" ondrop="onDrop(event,this)" ondragleave="onDragLeave(event)">
+        <span class="drop-placeholder">Drop RB here</span>
+      </div>
+    </div>
+    <div class="slot-row">
+      <div class="slot-label RB">RB</div>
+      <div class="drop-zone" id="slot-RB2" data-pos="RB" ondragover="onDragOver(event)" ondrop="onDrop(event,this)" ondragleave="onDragLeave(event)">
+        <span class="drop-placeholder">Drop RB here</span>
+      </div>
+    </div>
+    <div class="slot-row">
+      <div class="slot-label WR">WR</div>
+      <div class="drop-zone" id="slot-WR1" data-pos="WR" ondragover="onDragOver(event)" ondrop="onDrop(event,this)" ondragleave="onDragLeave(event)">
+        <span class="drop-placeholder">Drop WR here</span>
+      </div>
+    </div>
+    <div class="slot-row">
+      <div class="slot-label WR">WR</div>
+      <div class="drop-zone" id="slot-WR2" data-pos="WR" ondragover="onDragOver(event)" ondrop="onDrop(event,this)" ondragleave="onDragLeave(event)">
+        <span class="drop-placeholder">Drop WR here</span>
+      </div>
+    </div>
+    <div class="slot-row">
+      <div class="slot-label TE">TE</div>
+      <div class="drop-zone" id="slot-TE" data-pos="TE" ondragover="onDragOver(event)" ondrop="onDrop(event,this)" ondragleave="onDragLeave(event)">
+        <span class="drop-placeholder">Drop TE here</span>
+      </div>
+    </div>
+    <div class="slot-row">
+      <div class="slot-label FLEX">FLEX</div>
+      <div class="drop-zone" id="slot-FLEX" data-pos="FLEX" ondragover="onDragOver(event)" ondrop="onDrop(event,this)" ondragleave="onDragLeave(event)">
+        <span class="drop-placeholder">Drop RB / WR / TE here</span>
+      </div>
+    </div>
+    <div class="slot-row">
+      <div class="slot-label K">K</div>
+      <div class="drop-zone" id="slot-K" data-pos="K" ondragover="onDragOver(event)" ondrop="onDrop(event,this)" ondragleave="onDragLeave(event)">
+        <span class="drop-placeholder">Drop K here</span>
+      </div>
+    </div>
+    <div class="slot-row">
+      <div class="slot-label DST">DST</div>
+      <div class="drop-zone" id="slot-DST" data-pos="DST" ondragover="onDragOver(event)" ondrop="onDrop(event,this)" ondragleave="onDragLeave(event)">
+        <span class="drop-placeholder">Drop DST here</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: DISTRIBUTION -->
+  <div class="dist-panel">
+    <div class="dist-header">
+      <div class="dist-label">Their Distribution</div>
+      <div class="dist-score-big" id="expectedScore">—</div>
+      <div class="dist-score-label">Expected Fantasy Points</div>
+    </div>
+
+    <div class="dist-chart-wrap">
+      <canvas id="distChart"></canvas>
+    </div>
+
+    <div class="dist-stats-grid">
+      <div class="stat-box">
+        <div class="stat-box-val" style="color:var(--blue)" id="stdDev">—</div>
+        <div class="stat-box-label">Std Dev σ</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-val" style="color:var(--muted)" id="slotsFilled">0/9</div>
+        <div class="stat-box-label">Slots Filled</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-val" style="color:var(--green)" id="floorScore">—</div>
+        <div class="stat-box-label">Floor μ−σ</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-val" style="color:var(--blue)" id="ceilScore">—</div>
+        <div class="stat-box-label">Ceiling μ+σ</div>
+      </div>
+    </div>
+
+    <div class="ci-section">
+      <div class="ci-label">95% Confidence Interval</div>
+      <div class="ci-bar-track">
+        <div class="ci-bar-fill" id="ciBar" style="left:10%;width:60%"></div>
+        <div class="ci-dot" id="ciDot" style="left:40%"></div>
+      </div>
+      <div class="ci-numbers">
+        <span id="ciLow">—</span>
+        <span id="ciMid" style="color:var(--green)">μ</span>
+        <span id="ciHigh">—</span>
+      </div>
+    </div>
+
+    <div class="breakdown-section">
+      <div class="breakdown-title">Player Breakdown</div>
+      <div id="playerBreakdown">
+        <div class="empty-state">
+          <div class="big">📊</div>
+          Drop players into the lineup<br>to see their distribution breakdown.
         </div>
       </div>
-      <div class="player-list" id="myPlayerList"></div>
-    </div>
-    <div class="lineup-area">
-      <div class="lineup-title">YOUR LINEUP</div>
-      <div class="lineup-subtitle">Drag players from the pool into slots</div>
-      <div class="lineup-slots" id="myLineupSlots"></div>
-    </div>
-    <div class="dist-panel">
-      <div class="panel-header"><div class="panel-title">YOUR DISTRIBUTION</div></div>
-      <div class="dist-content" id="myDistContent">
-        <div class="empty-state"><div class="empty-icon">📊</div><div class="empty-text">Add players to see your score distribution</div></div>
-      </div>
     </div>
   </div>
 </div>
 
-<!-- ── OPPONENT LINEUP ── -->
-<div class="tab-panel" id="panel-opp-lineup">
-  <div class="app-layout">
-    <div class="player-pool" id="opp-pool-panel">
-      <div class="panel-header">
-        <div class="panel-title">PLAYER POOL</div>
-        <input class="search-input" type="text" placeholder="Search players..." id="oppSearchInput" />
-        <div class="pos-filters" id="oppPosFilters">
-          <button class="pos-btn active-ALL" data-pos="ALL">ALL</button>
-          <button class="pos-btn" data-pos="QB">QB</button>
-          <button class="pos-btn" data-pos="RB">RB</button>
-          <button class="pos-btn" data-pos="WR">WR</button>
-          <button class="pos-btn" data-pos="TE">TE</button>
-          <button class="pos-btn" data-pos="K">K</button>
-          <button class="pos-btn" data-pos="DST">DST</button>
-        </div>
-      </div>
-      <div class="player-list" id="oppPlayerList"></div>
-    </div>
-    <div class="lineup-area">
-      <div class="lineup-title" style="color:var(--accent2)">OPPONENT'S LINEUP</div>
-      <div class="lineup-subtitle">Drag their players into slots</div>
-      <div class="lineup-slots" id="oppLineupSlots"></div>
-    </div>
-    <div class="dist-panel">
-      <div class="panel-header"><div class="panel-title">THEIR DISTRIBUTION</div></div>
-      <div class="dist-content" id="oppDistContent">
-        <div class="empty-state"><div class="empty-icon">🎯</div><div class="empty-text">Add opponent's players to see their distribution</div></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ── BATTLE ── -->
-<div class="tab-panel" id="panel-battle">
-  <div class="battle-layout" id="battleContent">
-    <div class="empty-state" style="height:100%;justify-content:center;">
-      <div class="empty-icon" style="font-size:48px">⚡</div>
-      <div class="empty-text">Set both lineups to see the battle analysis</div>
-    </div>
-  </div>
-</div>
-
-<script src="data.js"></script>
-<script src="math.js"></script>
-<script src="charts.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
