@@ -219,6 +219,7 @@ header {
 }
 .card-name {
   font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 14px;
+  color: var(--text);
   /* FULL NAME — no truncation */
   white-space: normal; overflow: visible; word-break: break-word;
   line-height: 1.3; flex: 1;
