@@ -280,14 +280,28 @@ header {
   border: 2px solid rgba(77,166,255,0.32);
   border-radius: 12px; padding: 16px 20px; margin-bottom: 20px;
 }
+.my-identity-banner {
+  display: flex; align-items: center; gap: 16px;
+  background: linear-gradient(135deg, rgba(0,229,160,0.12) 0%, rgba(0,229,160,0.03) 100%);
+  border: 2px solid rgba(0,229,160,0.30);
+  border-radius: 12px; padding: 16px 20px; margin-bottom: 20px;
+}
 .opp-identity-icon { font-size: 34px; flex-shrink: 0; }
 .opp-identity-label {
   font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 3px;
   color: var(--blue); opacity: 0.75; margin-bottom: 3px; font-weight: 700;
 }
+.my-identity-label {
+  font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 3px;
+  color: var(--green); opacity: 0.85; margin-bottom: 3px; font-weight: 700;
+}
 .opp-identity-name {
   font-family: 'Bebas Neue', sans-serif; font-size: 30px; letter-spacing: 4px;
   color: var(--blue); line-height: 1;
+}
+.my-identity-name {
+  font-family: 'Bebas Neue', sans-serif; font-size: 30px; letter-spacing: 4px;
+  color: var(--green); line-height: 1;
 }
 .opp-identity-sub {
   font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted);
