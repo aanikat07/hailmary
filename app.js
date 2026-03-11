@@ -94,6 +94,49 @@ function defRankLabel(rank) {
   return 'LOCK';
 }
 
+// ── 2025-26 NFL Weekly Schedule ──────────────────────────────
+// Each team's opponent per week (null = bye)
+const NFL_SCHEDULE = {
+  ARI: [null,'LAR','DET','SF','NE',null,'MIN','CHI','SEA','LAR','NYG','PHI','SEA','CAR','NE','LAR','SF','SEA'],
+  ATL: ['PHI','KC','NO','TB',null,'CAR','TB','DAL','NO','CAR','DEN','MIN','NO','LV','CHI','CAR','TB','CAR'],
+  BAL: ['KC','LV','DAL',null,'BUF','CLE','WSH','CLE','PIT','CIN','PIT','LAC','NYG','PHI','HOU','PIT','CLE','CIN'],
+  BUF: ['NYJ','MIA','JAC','HOU',null,'BAL','NYJ','TEN','IND','MIA','KC','SF','LAR','DET','MIA','NE','NYJ','MIA'],
+  CAR: ['NO','CHI','LAR','ATL','WSH',null,'ATL','TB','PHI','ATL','LAR','TB','ATL','ARI','TB','ATL','TB','ATL'],
+  CHI: ['TEN','CAR','IND','LAR','JAC','MIN',null,'ARI','MIA','MIN','SEA','GB','GB','NO','ATL','DET','GB','MIN'],
+  CIN: ['NE','KC','WSH','CLE','SEA',null,'PHI','LAR','LV','BAL',null,'CLE','PIT','LAC','BAL','MIN','PIT','BAL'],
+  CLE: ['DAL','JAC','NYG',null,'WSH','BAL','LAC','BAL','DEN','PIT','MIA','CIN','LAC','DEN','MIA','BAL','BAL','PIT'],
+  DAL: ['CLE','PHI','BAL','DET','SF','NYG','SF','ATL',null,'NYG','WSH','WSH','NYG','PHI','KC','DET','WSH','PHI'],
+  DEN: ['SEA','PIT','TB','LV','LAC',null,'LAC','SF','CLE','HOU','ATL','LV','LAC','CLE','LV','HOU','HOU','LAC'],
+  DET: ['LAR','SF','ARI','DAL','SEA','MIN','LAR','HOU','GB','MIN',null,'CHI','GB','BUF','GB','CHI','DET','GB'],
+  GB:  ['PHI','IND','TEN',null,'LAR','ARI','JAC','JAC','MIN','TEN','MIN','CHI','CHI','MIN','DET','GB','CHI','DET'],
+  HOU: ['IND','MIN','JAC','BUF',null,'TEN','KC','DET','TEN','DEN','JAC','TEN','KC','TEN','BAL','DEN','DEN','TEN'],
+  IND: ['HOU','GB',null,'CHI','TEN','JAC','HOU','TEN','BUF','JAC','MIA','LAC','JAC','TEN','JAC','TEN','JAC','TEN'],
+  JAC: ['MIA','CLE','BUF','HOU','CHI','IND','GB','GB','HOU','IND','HOU','IND','IND','HOU','IND','HOU','IND','HOU'],
+  KC:  ['BAL','ATL',null,'NO','LAR','TB','HOU','NYG','SF','LV','BUF','KC','HOU','LV','DAL','KC','LV','KC'],
+  LAC: ['LV','DEN','PHI','NO','DEN','WSH','CLE','LV','NE','DEN','MIA','BAL','DEN','CIN','LAC','CIN','LAC','DEN'],
+  LAR: ['DET','ARI','CAR','CHI',null,'SF','DET','CIN','HOU','ARI','CAR','NE','BUF','NE','NE','ARI','NE','ARI'],
+  LV:  ['LAC','BAL','NE','DEN','KC',null,'NE','LAC','CIN','KC','LAC','DEN','DEN','KC','DEN','LAC','KC','LAC'],
+  MIA: ['JAC','BUF','SEA',null,'NYJ','NYJ','NYJ','SF','CHI','BUF','CLE','NYJ','NYJ','SEA','BUF','CLE','SEA','BUF'],
+  MIN: ['NYG','HOU','LAR',null,'GB','CHI','ARI','SEA','GB','DET','GB','ATL','LAR','GB','NE','CIN','NE','CHI'],
+  NE:  ['CIN','TEN','LV','SEA','ARI','SF','LV','WSH','LAC','SF','LAC','LAR','SF','LAR','ARI','BUF','MIN','MIN'],
+  NO:  ['CAR','WSH','ATL','KC','PHI',null,'TB','PHI','ATL','TB','PHI','CHI','ATL','CHI','TB','ATL','TB','ATL'],
+  NYG: ['MIN','WSH','CLE','PHI','SEA','DAL','NE','KC','SEA','DAL','ARI','SEA','BAL','WSH','PHI','WSH','PHI','WSH'],
+  NYJ: ['BUF','SF','TEN','DEN','MIA','MIA','BUF','WSH','MIA','WSH','NYJ','MIA','MIA','WSH','NYJ','WSH','BUF','WSH'],
+  PHI: ['ATL','DAL','LAC','NYG','NO','SF','CIN','NO','CAR','WSH','NO','ARI','WSH','BAL','NYG','WSH','NYG','DAL'],
+  PIT: ['ATL','DEN','KC',null,'LAC','DEN','LAC','CIN','BAL','CLE','BAL','WSH','CIN','LAR','PIT','BAL','CIN','CLE'],
+  SF:  ['NYJ','DET','LAR','ARI','DAL','PHI','DAL','DEN','KC','NE','NE','BUF','NE','LAC','LAR','ARI','LAR','ARI'],
+  SEA: ['DEN','TEN','MIA','NE','DET','LAR','TEN','MIN','ARI','LAR','CHI','NYG','ARI','MIA','WSH','NYG','MIA','ARI'],
+  TB:  ['WSH','PHI','DEN','ATL','NO','KC',null,'CAR','NO','NO','TB','CAR','NO','PHI','CAR','NO','CAR','NO'],
+  TEN: ['CHI','NE','GB','LAC','IND','HOU','SEA','BUF','HOU','GB','TEN','HOU','TEN','IND','TEN','IND','TEN','HOU'],
+  WSH: ['TB','NO','CIN','TEN','CAR','LAC','BAL','NYJ','NYJ','PHI','DAL','PIT','PHI','NYG','SEA','NYG','DAL','NYJ'],
+};
+
+// Get opponent for a team in a given week (1-indexed, returns null for bye)
+function getMatchup(team, week) {
+  if (!team || !NFL_SCHEDULE[team]) return null;
+  return NFL_SCHEDULE[team][week - 1] || null; // null = bye
+}
+
 // ── State ────────────────────────────────────────────────────
 let myLineup = {}, oppLineup = {};
 let myDragPlayer = null, oppDragPlayer = null;
@@ -189,9 +232,23 @@ function renderPool(side) {
     card.draggable = true;
     card.dataset.name = player.name;
 
+    const team = getTeam(player.name);
+    const opp  = getMatchup(team, currentWeek);
+    const defRank = opp ? getDefRank(opp, player.position) : null;
+    const rankColor = defRankColor(defRank);
+    const rankLbl   = defRankLabel(defRank);
+    const matchupHtml = opp
+      ? `<span class="card-matchup" style="color:${rankColor};border-color:${rankColor}22;background:${rankColor}12">
+           vs ${opp} <span class="card-matchup-grade">${rankLbl}</span>
+         </span>`
+      : `<span class="card-matchup card-matchup-bye">BYE</span>`;
+
     card.innerHTML = `
       <div class="card-row1">
-        <div class="card-name">${shortName(player.name)}</div>
+        <div class="card-name-row">
+          <div class="card-name">${shortName(player.name)}</div>
+          ${matchupHtml}
+        </div>
         <div class="card-badges">
           <span class="archetype-badge" style="background:${arch.color}22;color:${arch.color}">${arch.label}</span>
           <span class="boom-badge" style="background:${boomColor(boom)}22;color:${boomColor(boom)}">${boomLabel(boom)}</span>
