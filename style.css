@@ -10,7 +10,7 @@
   --bg:       #08090c;
   --surface:  #0f1117;
   --surface2: #161920;
-  --border:   #1d2130;
+  --border:   #252836;
 
   --green: #00e5a0;
   --blue:  #4da6ff;
@@ -21,8 +21,8 @@
   --accent2: #4da6ff;
   --accent3: #4da6ff;
 
-  --text:  #e8eaf0;
-  --muted: #4a5068;
+  --text:  #f0f2f8;
+  --muted: #7a829e;
 
   --qb:  #ff6b35;
   --rb:  #00e5a0;
@@ -221,11 +221,17 @@ header {
 .card-name-row {
   display: flex; align-items: center; justify-content: space-between; gap: 6px; width: 100%;
 }
+.card-name-block {
+  display: flex; align-items: baseline; gap: 6px; flex: 1; min-width: 0;
+}
 .card-name {
-  font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 13px;
-  color: #e8eaf0 !important;
+  font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 14px;
+  color: #f0f2f8 !important;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  flex: 1; min-width: 0;
+}
+.card-team {
+  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 700;
+  color: var(--muted); flex-shrink: 0; white-space: nowrap;
 }
 .card-matchup {
   font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 700;
@@ -427,11 +433,14 @@ header {
   padding: 7px 10px; background: var(--surface2);
   border: 1.5px solid var(--border); border-radius: 6px;
 }
+.bk-pos-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 .bk-name {
   font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 13px;
+  color: var(--text);
   flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.bk-mu    { font-family: 'DM Mono', monospace; font-size: 11px; }
+.bk-team { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); margin-left: 4px; }
+.bk-mu    { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 600; }
 .bk-sigma { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); }
 .bk-boom  { font-family: 'DM Mono', monospace; font-size: 10px; padding: 2px 5px; border-radius: 3px; flex-shrink: 0; }
 .my-dist-panel  .bk-mu { color: var(--green); }

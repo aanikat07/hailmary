@@ -180,6 +180,10 @@ function updateWeekContext() {
 
 // ── Helpers ──────────────────────────────────────────────────
 function shortName(name) { return name.replace(/\s*\([^)]*\)/, ''); }
+function playerTeam(name) {
+  const m = name.match(/\(([A-Z]+)\)/);
+  return m ? m[1] : '';
+}
 
 function getPlayers(lineup) {
   return Object.values(lineup).filter(Boolean).map(p => {
@@ -208,10 +212,31 @@ function renderPool(side) {
   const listId     = isMe ? 'myPlayerList' : 'oppPlayerList';
 
   const inLineup = new Set(getPlayers(lineup).map(p => p.name));
+
+  // Top 15 per position by current week μ
+  const TOP_N = 15;
+  const topByPos = {};
+  ['QB','RB','WR','TE','K','DST'].forEach(pos => {
+    topByPos[pos] = PLAYER_DATA
+      .filter(p => p.position === pos)
+      .sort((a, b) => (PLAYER_META[b.name]?.weekMu || 0) - (PLAYER_META[a.name]?.weekMu || 0))
+      .slice(0, TOP_N)
+      .map(p => p.name);
+  });
+  const topNames = new Set(Object.values(topByPos).flat());
+
+  const POS_ORDER = { QB:0, RB:1, WR:2, TE:3, K:4, DST:5 };
   const filtered = PLAYER_DATA.filter(p => {
     const posOk    = activePos === 'ALL' || p.position === activePos;
     const searchOk = !search || p.name.toLowerCase().includes(search.toLowerCase());
-    return posOk && searchOk;
+    const topOk    = search ? true : topNames.has(p.name);
+    return posOk && searchOk && topOk;
+  }).sort((a, b) => {
+    // Sort by position group first, then by μ within position
+    const posA = POS_ORDER[a.position] ?? 9;
+    const posB = POS_ORDER[b.position] ?? 9;
+    if (posA !== posB) return posA - posB;
+    return (PLAYER_META[b.name]?.weekMu || 0) - (PLAYER_META[a.name]?.weekMu || 0);
   });
 
   const list = document.getElementById(listId);
@@ -238,30 +263,33 @@ function renderPool(side) {
     const rankColor = defRankColor(defRank);
     const rankLbl   = defRankLabel(defRank);
     const matchupHtml = opp
-      ? `<span class="card-matchup" style="color:${rankColor};border-color:${rankColor}22;background:${rankColor}12">
-           vs ${opp} <span class="card-matchup-grade">${rankLbl}</span>
+      ? `<span class="card-matchup" style="color:${rankColor};border-color:${rankColor}44;background:${rankColor}18">
+           vs <strong>${opp}</strong> <span class="card-matchup-grade">${rankLbl}</span>
          </span>`
       : `<span class="card-matchup card-matchup-bye">BYE</span>`;
 
     card.innerHTML = `
-      <div class="card-row1">
-        <div class="card-name-row">
-          <div class="card-name">${shortName(player.name)}</div>
+      <div class="card-row1" style="display:flex;flex-direction:column;gap:4px;margin-bottom:4px">
+        <div class="card-name-row" style="display:flex;align-items:center;justify-content:space-between;gap:6px">
+          <div style="display:flex;align-items:baseline;gap:5px;flex:1;min-width:0;overflow:hidden">
+            <span style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:14px;color:#f0f2f8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${shortName(player.name)}</span>
+            <span style="font-family:'DM Mono',monospace;font-size:10px;font-weight:700;color:#7a829e;flex-shrink:0">${team}</span>
+          </div>
           ${matchupHtml}
         </div>
-        <div class="card-badges">
-          <span class="archetype-badge" style="background:${arch.color}22;color:${arch.color}">${arch.label}</span>
-          <span class="boom-badge" style="background:${boomColor(boom)}22;color:${boomColor(boom)}">${boomLabel(boom)}</span>
-          <span class="card-pos">${player.position}</span>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center">
+          <span style="font-family:'DM Mono',monospace;font-size:9px;padding:2px 5px;border-radius:3px;background:${arch.color}22;color:${arch.color}">${arch.label}</span>
+          <span style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 6px;border-radius:3px;font-weight:600;background:${boomColor(boom)}22;color:${boomColor(boom)}">${boomLabel(boom)}</span>
+          <span style="font-family:'DM Mono',monospace;font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:${POS_COLORS[player.position]}22;color:${POS_COLORS[player.position]}">${player.position}</span>
         </div>
       </div>
-      <div class="card-row2">
-        <span class="card-stat">μ <span>${wmu}</span></span>
-        <span class="card-stat">σ <span>${wsigma}</span></span>
-        <span class="card-stat">n=<span>${priorN}</span></span>
-        ${actual !== null ? `<span class="card-stat actual-score">Wk${currentWeek}: <span style="color:${actual > parseFloat(wmu) ? '#00e5a0' : '#4da6ff'}">${actual}</span></span>` : ''}
+      <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">
+        <span style="font-family:'DM Mono',monospace;font-size:11px;color:#7a829e">μ <span style="color:#f0f2f8;font-weight:600">${wmu}</span></span>
+        <span style="font-family:'DM Mono',monospace;font-size:11px;color:#7a829e">σ <span style="color:#f0f2f8;font-weight:600">${wsigma}</span></span>
+        <span style="font-family:'DM Mono',monospace;font-size:11px;color:#7a829e">n=<span style="color:#f0f2f8;font-weight:600">${priorN}</span></span>
+        ${actual !== null ? `<span style="font-family:'DM Mono',monospace;font-size:10px;color:#7a829e;margin-left:auto">Wk${currentWeek}: <span style="color:${actual > parseFloat(wmu) ? '#00e5a0' : '#f87171'};font-weight:600">${actual}</span></span>` : ''}
       </div>
-      <canvas class="mini-dist" id="mini-${side}-${player.name.replace(/\W/g,'_')}"></canvas>
+      <canvas class="mini-dist" id="mini-${side}-${player.name.replace(/\W/g,'_')}" style="width:100%;height:22px;margin-top:5px"></canvas>
     `;
 
     card.addEventListener('dragstart', e => {
@@ -413,14 +441,12 @@ function renderDistPanel(side) {
   }
 
   content.innerHTML = `
-    <!-- DISTRIBUTION — front and center at top -->
     <div class="dist-chart-hero">
       <div class="section-label" style="margin-bottom:8px">SCORE DISTRIBUTION · WK ${currentWeek}</div>
       <canvas id="main-canvas-${side}" style="height:110px"></canvas>
       <div class="dist-chart-context">
-        T ~ N(${stats.mu.toFixed(1)}, ${stats.sigma.toFixed(1)}²) · CLT sum of ${stats.count} players<br>
-        MLE fitted on weeks 1–${currentWeek - 1} (no lookahead)
-        ${isMe ? ` · <span style="color:var(--green)">${wp.toFixed(1)}% WIN vs ${oppScore.toFixed(0)} pts</span>` : ''}
+        Fitted on weeks 1–${currentWeek - 1} · ${stats.count} players · T ~ N(${stats.mu.toFixed(1)}, ${stats.sigma.toFixed(1)}²)
+        ${isMe ? ` · <span style="color:var(--green);font-weight:700">${wp.toFixed(1)}% WIN vs ${oppScore.toFixed(0)} pts</span>` : ''}
       </div>
     </div>
 
@@ -431,35 +457,20 @@ function renderDistPanel(side) {
     </div>
 
     <div class="stats-grid">
-      <div class="stat-box"><div class="stat-box-val">${stats.sigma.toFixed(1)}</div><div class="stat-box-lbl">STD DEV σ</div></div>
-      <div class="stat-box"><div class="stat-box-val">${stats.count}/9</div><div class="stat-box-lbl">SLOTS FILLED</div></div>
-      <div class="stat-box"><div class="stat-box-val">${(stats.mu - stats.sigma).toFixed(1)}</div><div class="stat-box-lbl">FLOOR μ−σ</div></div>
-      <div class="stat-box"><div class="stat-box-val">${(stats.mu + stats.sigma).toFixed(1)}</div><div class="stat-box-lbl">CEILING μ+σ</div></div>
-    </div>
-
-    <div>
-      <div class="section-label">Bootstrap 95% CI on μ</div>
-      <div class="ci-bar-wrap" id="ci-wrap-${side}">
-        <div class="ci-labels"><span>${ci.lower.toFixed(1)}</span><span>${stats.mu.toFixed(1)}</span><span>${ci.upper.toFixed(1)}</span></div>
-        <div class="ci-bar-track">
-          <div class="ci-bar-range" id="ci-range-${side}"></div>
-          <div class="ci-bar-dot" id="ci-dot-${side}"></div>
-        </div>
-        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted)">
-          95% CI: [${ci.lower.toFixed(1)}, ${ci.upper.toFixed(1)}] · width=${((ci.upper - ci.lower)).toFixed(1)} pts
-        </div>
-      </div>
+      <div class="stat-box"><div class="stat-box-val" style="color:var(--text)">${stats.sigma.toFixed(1)}</div><div class="stat-box-lbl">STD DEV σ</div></div>
+      <div class="stat-box"><div class="stat-box-val" style="color:var(--text)">${stats.count}/9</div><div class="stat-box-lbl">SLOTS FILLED</div></div>
+      <div class="stat-box"><div class="stat-box-val" style="color:#f87171">${(stats.mu - stats.sigma).toFixed(1)}</div><div class="stat-box-lbl">FLOOR</div></div>
+      <div class="stat-box"><div class="stat-box-val" style="color:var(--green)">${(stats.mu + stats.sigma).toFixed(1)}</div><div class="stat-box-lbl">CEILING</div></div>
     </div>
 
     ${isMe ? `
     <div class="opp-section">
-      <div class="section-label" style="margin-bottom:6px">VS FIXED SCORE</div>
+      <div class="section-label" style="margin-bottom:8px">VS OPPONENT SCORE</div>
       <div class="opp-row">
         <input class="opp-input" id="oppScoreNum" type="number" min="0" max="300" value="${oppScore.toFixed(0)}" />
         <input class="opp-slider" id="oppScoreSlider" type="range" min="60" max="250" value="${oppScore.toFixed(0)}" />
       </div>
       <div class="win-pct">${wp.toFixed(1)}% WIN</div>
-      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted)">P(score > ${oppScore.toFixed(0)} pts)</div>
       <div class="win-bar"><div class="win-bar-fill" style="width:${Math.min(100,wp)}%"></div></div>
     </div>` : ''}
 
@@ -470,34 +481,19 @@ function renderDistPanel(side) {
       <div class="breakdown-list">
         ${players.map(p => {
           const boom = PLAYER_META[p.name].boom;
+          const team = playerTeam(p.name);
           return `<div class="bk-row">
-            <div class="bk-name" style="color:${POS_COLORS[p.position]}">${shortName(p.name)}</div>
-            <div class="bk-mu">μ=${p.mu.toFixed(1)}</div>
-            <div class="bk-sigma">σ=${p.sigma.toFixed(1)}</div>
+            <div class="bk-pos-dot" style="background:${POS_COLORS[p.position]}"></div>
+            <div class="bk-name">${shortName(p.name)} <span class="bk-team">${team}</span></div>
+            <div class="bk-mu" style="color:${isMe ? 'var(--green)' : 'var(--blue)'}">μ ${p.mu.toFixed(1)}</div>
             <div class="bk-boom" style="background:${boomColor(boom)}22;color:${boomColor(boom)}">${(boom*100).toFixed(0)}%</div>
           </div>`;
         }).join('')}
       </div>
     </div>
-
-    <div style="background:rgba(0,0,0,0.2);border:1.5px solid var(--border);border-radius:6px;padding:10px;font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);line-height:1.8">
-      MLE: μ̂=(1/n)Σxᵢ · σ̂²=(1/n)Σ(xᵢ−μ̂)²<br>
-      Bootstrap: resample scores × 300 → 95% CI<br>
-      LogReg: P(boom)=σ(wᵀx+b) · acc=75.4%
-    </div>
   `;
 
   requestAnimationFrame(() => {
-    // CI bar
-    const range = document.getElementById(`ci-range-${side}`);
-    const dot   = document.getElementById(`ci-dot-${side}`);
-    const fullRange = (stats.mu + stats.sigma) - (stats.mu - stats.sigma);
-    const low  = Math.max(0, ci.lower - (stats.mu - stats.sigma));
-    const high = Math.min(fullRange, ci.upper - (stats.mu - stats.sigma));
-    if (range) { range.style.left = `${(low / fullRange) * 100}%`; range.style.width = `${((high - low) / fullRange) * 100}%`; }
-    if (dot)   { dot.style.left = '50%'; }
-
-    // Main distribution canvas
     const canvas = document.getElementById(`main-canvas-${side}`);
     if (canvas) drawMainDist(canvas, stats.mu, stats.sigma, isMe ? oppScore : null, color);
 
