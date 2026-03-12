@@ -547,18 +547,20 @@ function renderBattle() {
     </div>
 
     <div class="diff-dist-section">
-      <div class="section-label" style="margin-bottom:8px">SCORE DIFFERENTIAL — D = T_you − T_opp</div>
+      <div class="section-label" style="margin-bottom:10px">SCORE DIFFERENTIAL — D = T_you − T_opp</div>
+
+      <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);margin-bottom:10px;line-height:1.8">
+        D ~ N(${mu_D.toFixed(1)}, ${sigma_D.toFixed(1)}²) = N(μ_you − μ_opp, σ²_you + σ²_opp)<br>
+        <span style="color:#00e5a0;font-weight:600">■ Green = P(you win) = ${wp.toFixed(1)}%</span> &nbsp;·&nbsp; <span style="color:#4da6ff;font-weight:600">■ Blue = P(opp wins) = ${(100-wp).toFixed(1)}%</span>
+      </div>
+
+      <div style="margin-bottom:12px;padding:14px 16px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);line-height:1.9">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--text);margin-bottom:8px">HOW TO READ THIS CURVE</div>
+        This curve shows every possible score difference between your lineup and theirs on game day. <span style="color:#00e5a0;font-weight:600">Green</span> = outcomes where you win (D &gt; 0). <span style="color:#4da6ff;font-weight:600">Blue</span> = outcomes where they win (D &lt; 0). The dashed line at 0 is the win/loss threshold.<br><br>
+        A <strong>wider curve</strong> means more combined variance — even with a projected edge, a big chunk can bleed into losing territory. A <strong>narrower curve</strong> means a more predictable game. If you're the underdog, you want a wide curve — variance is your only path to an upset.
+      </div>
+
       <canvas id="diff-canvas" style="height:120px"></canvas>
-      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;line-height:1.9">
-        D ~ N(${mu_D.toFixed(1)}, ${sigma_D.toFixed(1)}²) = N(μ_you−μ_opp, σ²_you+σ²_opp)<br>
-        <span style="color:#00e5a0">■ Green = P(you win) = ${wp.toFixed(1)}%</span> · <span style="color:#4da6ff">■ Blue = P(opp wins) = ${(100-wp).toFixed(1)}%</span>
-      </div>
-      <div style="margin-top:10px;padding:12px 14px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);line-height:2.0">
-        <div style="color:var(--text);font-weight:700;letter-spacing:1px;margin-bottom:6px">HOW TO READ THIS CURVE</div>
-        This curve models the distribution of all possible <em>score differences</em> between your lineup and theirs on game day. It is derived from the Central Limit Theorem: since each player's score is modeled as N(μ, σ²), the sum of a lineup is also normal, and the difference of two normals is itself normal with μ = μ_you − μ_opp and σ² = σ²_you + σ²_opp.<br><br>
-        <span style="color:#00e5a0">■ Green area</span> = outcomes where you win (D &gt; 0). <span style="color:#4da6ff">■ Blue area</span> = outcomes where they win (D &lt; 0). The <strong style="color:var(--text)">dashed vertical line</strong> at x=0 is the win/loss threshold.<br><br>
-        A <strong style="color:var(--text)">wider curve</strong> means more combined variance — even if your expected edge is positive, a lot of the curve still bleeds left, meaning upsets are common. A <strong style="color:var(--text)">narrow curve</strong> means both rosters are consistent and the outcome is more deterministic. When you're the underdog (curve centered left of 0), you want <em>high variance</em> — it's your only path to an upset.
-      </div>
     </div>
 
     <div class="risk-toggle">
