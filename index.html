@@ -211,6 +211,26 @@
   </div>
 </div>
 
+<!-- ══ WELCOME POPUP ══════════════════════════════════════════ -->
+<div class="welcome-overlay" id="welcomeOverlay">
+  <div class="welcome-panel">
+    <div class="welcome-logo"><span class="logo-hail">HAIL</span><span class="logo-mary">MARY</span></div>
+    <div class="welcome-sub">Probabilistic Fantasy Football Optimizer · CS109</div>
+    <div class="welcome-body">
+      <p>Most fantasy apps give you a single projected score. <strong>HailMary gives you a full probability distribution.</strong></p>
+      <div class="welcome-features">
+        <div class="welcome-feature"><span class="wf-icon">📊</span><span><strong>MLE Projections</strong> — Player μ and σ fitted on actual weekly data, recalculated every week</span></div>
+        <div class="welcome-feature"><span class="wf-icon">🎯</span><span><strong>Win Probability</strong> — Uses the Central Limit Theorem to model your full lineup score as a normal distribution</span></div>
+        <div class="welcome-feature"><span class="wf-icon">🔥</span><span><strong>Boom %</strong> — Logistic regression model predicting standout weeks, trained on 2025 season data</span></div>
+        <div class="welcome-feature"><span class="wf-icon">⚡</span><span><strong>Battle Mode</strong> — Head-to-head score differential distribution with P(you win) calculated analytically</span></div>
+      </div>
+      <p style="color:var(--muted);font-size:12px;margin-top:16px">Set your lineup → set your opponent's lineup → go to ⚡ Battle to see your win probability.</p>
+    </div>
+    <button class="welcome-btn" id="welcomeCloseBtn">LET'S GO →</button>
+    <div class="welcome-dismiss">click anywhere outside to dismiss</div>
+  </div>
+</div>
+
 <script src="data.js"></script>
 <script src="math.js"></script>
 <script src="charts.js"></script>
@@ -224,6 +244,15 @@
   guideOverlay.addEventListener('click', e => {
     if (e.target === guideOverlay) guideOverlay.classList.remove('open');
   });
+
+  // Welcome popup
+  const welcomeOverlay  = document.getElementById('welcomeOverlay');
+  const welcomeCloseBtn = document.getElementById('welcomeCloseBtn');
+  const closeWelcome = () => welcomeOverlay.classList.remove('open');
+  welcomeCloseBtn.addEventListener('click', closeWelcome);
+  welcomeOverlay.addEventListener('click', e => { if (e.target === welcomeOverlay) closeWelcome(); });
+  // Show on load
+  setTimeout(() => welcomeOverlay.classList.add('open'), 200);
 </script>
 </body>
 </html>
