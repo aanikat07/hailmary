@@ -402,44 +402,49 @@ function renderDistPanel(side) {
   });
   const ci = bootstrapCI(allScores, 300);
 
-  // Build defensive rankings for opp panel — show ranks for positions that are in lineup
-  let defHtml = '';
-  if (!isMe) {
-    const positions = ['QB', 'RB', 'WR', 'TE', 'K', 'DST'];
-    const rankRows = positions.map(pos => {
-      // Get a representative player for this position in opp lineup
-      const slotPlayer = Object.entries(oppLineup).find(([slotId, p]) => p && p.position === pos || (pos === 'RB' && slotId.startsWith('RB') && p && p.position === 'RB') || (pos === 'WR' && slotId.startsWith('WR') && p && p.position === 'WR'));
-      const team = slotPlayer ? getTeam(slotPlayer[1].name) : null;
-      const rank = team ? getDefRank(team, pos) : null;
-      const posColor = POS_COLORS[pos] || '#fff';
-      const barColor = rank ? defRankColor(rank) : '#1d2130';
-      const barWidth = rank ? Math.round((rank / 32) * 100) : 0;
-      const label = rank ? `#${rank} vs ${pos}` : `– vs ${pos}`;
-      const noteLabel = rank ? defRankLabel(rank) : '—';
-      const noteColor = rank ? defRankColor(rank) : '#4a5068';
-      return `
-        <div class="def-row">
-          <div class="def-pos" style="color:${posColor}">${pos}</div>
-          <div class="def-rank-num" style="color:${barColor}">${rank ? '#' + rank : '—'}</div>
-          <div class="def-bar-track">
-            <div class="def-bar-fill" style="width:${barWidth}%;background:${barColor}"></div>
-          </div>
-          <div class="def-rank-note-inline" style="color:${noteColor};font-family:'DM Mono',monospace;font-size:9px">${noteLabel}</div>
-        </div>`;
-    }).join('');
-
-    // Count how many opp slots are filled to show context
-    const filledTeams = players.map(p => getTeam(p.name)).filter(t => t && t !== 'FA');
-    const uniqueTeams = [...new Set(filledTeams)];
-    const teamStr = uniqueTeams.length > 0 ? `Based on players from: ${uniqueTeams.join(', ')}` : 'Add players to see defensive matchup grades';
-
-    defHtml = `
-      <div class="def-box">
-        <div class="def-box-title">DEF RANKINGS VS POSITION · 2025–26</div>
-        ${rankRows}
-        <div class="def-box-note">${teamStr}<br>Rank 1 = softest matchup (most pts allowed) · Rank 32 = toughest</div>
+  // Build defensive rankings — for MY panel show opponent def ranks for my players' matchups
+  // For OPP panel show opponent def ranks for their players' matchups
+  const lineup = isMe ? myLineup : oppLineup;
+  const positions = ['QB', 'RB', 'WR', 'TE', 'K', 'DST'];
+  const rankRows = positions.map(pos => {
+    const slotPlayer = Object.entries(lineup).find(([slotId, p]) => p && (
+      p.position === pos ||
+      (pos === 'RB' && slotId.startsWith('RB') && p.position === 'RB') ||
+      (pos === 'WR' && slotId.startsWith('WR') && p.position === 'WR')
+    ));
+    const playerName = slotPlayer ? slotPlayer[1].name : null;
+    const team = playerName ? playerTeam(playerName) : null;
+    // For def ranking: look up the OPPONENT of that team this week
+    const opp = team ? getMatchup(team, currentWeek) : null;
+    const rank = opp ? getDefRank(opp, pos) : null;
+    const posColor = POS_COLORS[pos] || '#fff';
+    const barColor = rank ? defRankColor(rank) : '#1d2130';
+    const barWidth = rank ? Math.round((rank / 32) * 100) : 0;
+    const noteLabel = rank ? defRankLabel(rank) : '—';
+    const noteColor = rank ? defRankColor(rank) : '#4a5068';
+    return `
+      <div class="def-row">
+        <div class="def-pos" style="color:${posColor}">${pos}</div>
+        <div class="def-rank-num" style="color:${barColor}">${rank ? '#' + rank : '—'}</div>
+        <div class="def-bar-track">
+          <div class="def-bar-fill" style="width:${barWidth}%;background:${barColor}"></div>
+        </div>
+        <div class="def-rank-note-inline" style="color:${noteColor};font-family:'DM Mono',monospace;font-size:9px">${noteLabel}</div>
       </div>`;
-  }
+  }).join('');
+
+  const filledTeams = players.map(p => playerTeam(p.name)).filter(Boolean);
+  const uniqueTeams = [...new Set(filledTeams)];
+  const teamStr = uniqueTeams.length > 0
+    ? `Based on players from: ${uniqueTeams.join(', ')}`
+    : 'Add players to see defensive matchup grades';
+
+  const defHtml = `
+    <div class="def-box">
+      <div class="def-box-title">DEF RANKINGS VS POSITION · 2025–26</div>
+      ${rankRows}
+      <div class="def-box-note">${teamStr}<br>Rank 1 = softest matchup (most pts allowed) · Rank 32 = toughest</div>
+    </div>`;
 
   content.innerHTML = `
     <div class="dist-chart-hero">
@@ -447,7 +452,6 @@ function renderDistPanel(side) {
       <canvas id="main-canvas-${side}" style="height:110px"></canvas>
       <div class="dist-chart-context">
         Fitted on weeks 1–${currentWeek - 1} · ${stats.count} players · T ~ N(${stats.mu.toFixed(1)}, ${stats.sigma.toFixed(1)}²)
-        ${isMe ? ` · <span style="color:var(--green);font-weight:700">${wp.toFixed(1)}% WIN vs ${oppScore.toFixed(0)} pts</span>` : ''}
       </div>
     </div>
 
@@ -463,17 +467,6 @@ function renderDistPanel(side) {
       <div class="stat-box"><div class="stat-box-val" style="color:#f87171">${(stats.mu - stats.sigma).toFixed(1)}</div><div class="stat-box-lbl">FLOOR</div></div>
       <div class="stat-box"><div class="stat-box-val" style="color:var(--green)">${(stats.mu + stats.sigma).toFixed(1)}</div><div class="stat-box-lbl">CEILING</div></div>
     </div>
-
-    ${isMe ? `
-    <div class="opp-section">
-      <div class="section-label" style="margin-bottom:8px">VS OPPONENT SCORE</div>
-      <div class="opp-row">
-        <input class="opp-input" id="oppScoreNum" type="number" min="0" max="300" value="${oppScore.toFixed(0)}" />
-        <input class="opp-slider" id="oppScoreSlider" type="range" min="60" max="250" value="${oppScore.toFixed(0)}" />
-      </div>
-      <div class="win-pct">${wp.toFixed(1)}% WIN</div>
-      <div class="win-bar"><div class="win-bar-fill" style="width:${Math.min(100,wp)}%"></div></div>
-    </div>` : ''}
 
     ${defHtml}
 
@@ -496,21 +489,7 @@ function renderDistPanel(side) {
 
   requestAnimationFrame(() => {
     const canvas = document.getElementById(`main-canvas-${side}`);
-    if (canvas) drawMainDist(canvas, stats.mu, stats.sigma, isMe ? oppScore : null, color);
-
-    // Opponent score controls (my panel only)
-    if (isMe) {
-      const numInput = document.getElementById('oppScoreNum');
-      const slider   = document.getElementById('oppScoreSlider');
-      const update = val => {
-        oppManualScore = parseFloat(val) || null;
-        if (numInput) numInput.value = val;
-        if (slider)   slider.value   = val;
-        renderDistPanel('my');
-      };
-      if (numInput) numInput.addEventListener('input', e => update(e.target.value));
-      if (slider)   slider.addEventListener('input',   e => update(e.target.value));
-    }
+    if (canvas) drawMainDist(canvas, stats.mu, stats.sigma, null, color);
   });
 }
 
