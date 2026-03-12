@@ -582,35 +582,6 @@ function renderBattle() {
       </div>
     </div>
 
-    <div style="margin-bottom:20px;padding:24px 28px;background:rgba(255,255,255,0.025);border:1px solid var(--border);border-radius:14px;">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--text);margin-bottom:6px">How to read these cards</div>
-      <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.6">Each card compares one of your players head-to-head against their opponent at the same position. Here's what the labels actually mean and why they matter.</div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
-        <div style="background:rgba(255,209,102,0.06);border:1px solid rgba(255,209,102,0.2);border-radius:10px;padding:16px 18px">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:#ffd166;margin-bottom:8px">💥 BOOM/BUST</div>
-          <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);line-height:1.7">This player's scores swing wildly week to week. Most apps just show you their average — we show you the risk. Start them when you're the underdog and need a big game. Bench them when you're favored and want a safe floor.</div>
-        </div>
-        <div style="background:rgba(0,229,160,0.06);border:1px solid rgba(0,229,160,0.2);border-radius:10px;padding:16px 18px">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:#00e5a0;margin-bottom:8px">📊 CONSISTENT</div>
-          <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);line-height:1.7">Week in, week out, this player shows up near their average — no huge surprises in either direction. The backbone of a safe lineup. When you're already favored, these players protect your lead.</div>
-        </div>
-        <div style="background:rgba(167,139,250,0.06);border:1px solid rgba(167,139,250,0.2);border-radius:10px;padding:16px 18px">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:#a78bfa;margin-bottom:8px">🏰 FLOOR MONSTER</div>
-          <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);line-height:1.7">Elite production AND low variance — the best of both worlds. Think a workhorse RB on a run-heavy team, or a dominant TE with no competition. Start them every week, no questions asked.</div>
-        </div>
-        <div style="background:rgba(248,113,113,0.06);border:1px solid rgba(248,113,113,0.2);border-radius:10px;padding:16px 18px">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:#f87171;margin-bottom:8px">🚨 INJURY RISK</div>
-          <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);line-height:1.7">This player has missed significant time this season, so their projection is based on fewer games and is less reliable. Check injury reports before locking them in — a DNP tanks your lineup.</div>
-        </div>
-      </div>
-
-      <div style="background:rgba(77,166,255,0.06);border:1px solid rgba(77,166,255,0.2);border-radius:10px;padding:18px 20px">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:#4da6ff;margin-bottom:10px">🔥 Boom % — what other apps don't tell you</div>
-        <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);line-height:1.8">Most fantasy apps rank players by projected points. We also calculate the <span style="color:#4da6ff;font-weight:600">probability of a standout week</span> — the chance a player scores 1.5× their own seasonal average. When two players have similar projections, Boom % tells you which one has real upside and which one is just going to be "fine."<br><br><span style="color:var(--muted);font-size:12px">Estimated via logistic regression on 6 features: projected μ, σ, matchup difficulty, recent form, position, and games played. Model accuracy: 75.4% on held-out data.</span></div>
-      </div>
-    </div>
-
     <div class="risk-toggle">
       <div class="risk-label">RISK MODE — affects matchup priority</div>
       <button class="risk-btn ${riskMode === 'safe'   ? 'active-safe'   : ''}" data-risk="safe">SAFE — FLOOR</button>
@@ -619,6 +590,40 @@ function renderBattle() {
 
     ${sortedMatchups.length > 0 ? `
     <div>
+      <div style="margin-bottom:16px;border:1px solid var(--border);border-radius:12px;overflow:hidden">
+        <button id="guideToggleBtn" onclick="(function(){var c=document.getElementById('guideToggleBody');var b=document.getElementById('guideToggleBtn');var open=c.style.display!=='none';c.style.display=open?'none':'block';b.querySelector('.guide-chevron').textContent=open?'▸':'▾';})()" style="width:100%;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.03);border:none;cursor:pointer;padding:14px 18px;text-align:left">
+          <div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;color:var(--text)">How to read these cards</div>
+            <div style="font-family:'DM Sans',sans-serif;font-size:11px;color:var(--muted);margin-top:2px">Archetypes · Boom % · What the labels mean</div>
+          </div>
+          <span class="guide-chevron" style="font-size:14px;color:var(--muted);flex-shrink:0">▸</span>
+        </button>
+        <div id="guideToggleBody" style="display:none;padding:20px 20px 24px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+            <div style="background:rgba(255,107,53,0.07);border:1px solid rgba(255,107,53,0.25);border-radius:10px;padding:14px 16px">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:#ff6b35;margin-bottom:7px">💥 BOOM/BUST</div>
+              <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);line-height:1.7">Scores swing wildly week to week. Most apps just show the average — we show the risk. Start them when you're the underdog and need a big game. Bench them when you're favored and want safety.</div>
+            </div>
+            <div style="background:rgba(77,159,255,0.07);border:1px solid rgba(77,159,255,0.25);border-radius:10px;padding:14px 16px">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:#4d9fff;margin-bottom:7px">📊 CONSISTENT</div>
+              <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);line-height:1.7">Shows up near their average every week — no huge surprises in either direction. The backbone of a safe lineup. When you're already favored, consistent players protect your lead.</div>
+            </div>
+            <div style="background:rgba(0,229,160,0.07);border:1px solid rgba(0,229,160,0.25);border-radius:10px;padding:14px 16px">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:#00e5a0;margin-bottom:7px">🏰 FLOOR MONSTER</div>
+              <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);line-height:1.7">Elite production AND low variance — the best of both worlds. Think a workhorse RB on a run-heavy team or a dominant TE with no competition. Start them every week, no questions asked.</div>
+            </div>
+            <div style="background:rgba(255,77,109,0.07);border:1px solid rgba(255,77,109,0.25);border-radius:10px;padding:14px 16px">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:#ff4d6d;margin-bottom:7px">🚨 INJURY RISK</div>
+              <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);line-height:1.7">Missed significant time this season — projection is based on fewer games and is less reliable. Check injury reports before locking them in. A DNP tanks your lineup.</div>
+            </div>
+          </div>
+          <div style="background:rgba(0,229,160,0.05);border:1px solid rgba(0,229,160,0.2);border-radius:10px;padding:16px 18px">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:#00e5a0;margin-bottom:8px">🔥 What is Boom %?</div>
+            <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);line-height:1.8">Most apps rank players by projected points. We also calculate the <span style="color:#00e5a0;font-weight:600">probability of a standout week</span> — the chance a player scores 1.5× their own seasonal average. When two players have similar projections, Boom % tells you which one has real upside and which one is just going to be "fine."<br><br><span style="color:var(--muted);font-size:12px">Estimated via logistic regression on 6 features: projected μ, σ, matchup difficulty, recent form, position, and games played. Model accuracy: 75.4% on held-out data.</span></div>
+          </div>
+        </div>
+      </div>
+
       <div class="section-label" style="margin-bottom:10px">POSITION MATCHUPS · WK ${currentWeek}</div>
       <div class="matchups-grid" id="matchupsGrid">
         ${sortedMatchups.map((m, idx) => renderMatchupCard(m, idx)).join('')}
@@ -679,14 +684,14 @@ function renderMatchupCard(m, idx) {
           <div class="mp-name" style="color:#00e5a0">${shortName(m.mine.name)}</div>
           <div class="mp-mu">μ=${myMeta.weekMu.toFixed(1)} · σ=${myMeta.weekSigma.toFixed(1)}</div>
           <div class="mp-boom" style="background:${boomColor(myMeta.boom)}22;color:${boomColor(myMeta.boom)}">${(myMeta.boom*100).toFixed(0)}% boom</div>
-          <div style="font-family:'DM Mono',monospace;font-size:8px;color:${myMeta.archetype.color};margin-top:2px">${myMeta.archetype.label}</div>
+          ${myMeta.archetype.label !== 'BALANCED' ? `<div style="font-family:'DM Mono',monospace;font-size:8px;color:${myMeta.archetype.color};margin-top:2px">${myMeta.archetype.label}</div>` : ''}
         </div>
         <div class="vs-small">VS</div>
         <div class="matchup-player">
           <div class="mp-name" style="color:#4da6ff">${shortName(m.opp.name)}</div>
           <div class="mp-mu">μ=${oppMeta.weekMu.toFixed(1)} · σ=${oppMeta.weekSigma.toFixed(1)}</div>
           <div class="mp-boom" style="background:${boomColor(oppMeta.boom)}22;color:${boomColor(oppMeta.boom)}">${(oppMeta.boom*100).toFixed(0)}% boom</div>
-          <div style="font-family:'DM Mono',monospace;font-size:8px;color:${oppMeta.archetype.color};margin-top:2px">${oppMeta.archetype.label}</div>
+          ${oppMeta.archetype.label !== 'BALANCED' ? `<div style="font-family:'DM Mono',monospace;font-size:8px;color:${oppMeta.archetype.color};margin-top:2px">${oppMeta.archetype.label}</div>` : ''}
         </div>
       </div>
       <canvas class="matchup-canvas" id="matchup-canvas-${idx}"></canvas>
