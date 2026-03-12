@@ -29,8 +29,12 @@ function mleSigma(scores) {
   return Math.sqrt(variance);
 }
 
-// Get MLE params using only data up to (but not including) the target week
-// Returns {mu, sigma, scores} based on prior weeks only
+// Get MLE params using only data up to (but not including) the target week.
+// In early weeks (few data points), we use bootstrap resampling to estimate
+// the standard error of mu-hat, then add it to sigma to reflect parameter uncertainty.
+// This means early-week distributions are wider — honestly capturing that we don't
+// yet have enough data to trust the MLE estimate. As n grows, the bootstrap SE
+// shrinks toward zero and sigma converges to pure score variance.
 function getMleAtWeek(player, targetWeek) {
   const priorScores = [];
   for (let w = 1; w < targetWeek; w++) {
@@ -38,9 +42,31 @@ function getMleAtWeek(player, targetWeek) {
     if (s !== undefined) priorScores.push(s);
   }
   if (priorScores.length < 2) return null;
-  const mu = mleMean(priorScores);
+
+  const mu    = mleMean(priorScores);
   const sigma = Math.max(0.1, mleSigma(priorScores));
-  return { mu, sigma, scores: priorScores };
+
+  // Bootstrap SE of mu-hat — quantifies how uncertain we are about mu itself.
+  // With n=3 games this is large; with n=14 games it's negligible.
+  // We only run bootstrap when n < 10 to save compute; beyond that SE is small enough to ignore.
+  let bootstrapSE = 0;
+  const n = priorScores.length;
+  if (n < 10) {
+    const nB = 300;
+    const bootMeans = [];
+    for (let b = 0; b < nB; b++) {
+      let sum = 0;
+      for (let i = 0; i < n; i++) sum += priorScores[Math.floor(Math.random() * n)];
+      bootMeans.push(sum / n);
+    }
+    const bootMu  = bootMeans.reduce((a, x) => a + x, 0) / nB;
+    bootstrapSE   = Math.sqrt(bootMeans.reduce((a, x) => a + (x - bootMu) ** 2, 0) / nB);
+  }
+
+  // Inflate sigma by bootstrap SE — wider distribution in early weeks, tighter as data accumulates
+  const adjustedSigma = Math.sqrt(sigma * sigma + bootstrapSE * bootstrapSE);
+
+  return { mu, sigma: adjustedSigma, rawSigma: sigma, bootstrapSE, scores: priorScores };
 }
 
 // Get actual score for a given week (or null if didn't play)
