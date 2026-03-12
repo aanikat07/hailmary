@@ -251,8 +251,8 @@
   const closeWelcome = () => welcomeOverlay.classList.remove('open');
   welcomeCloseBtn.addEventListener('click', closeWelcome);
   welcomeOverlay.addEventListener('click', e => { if (e.target === welcomeOverlay) closeWelcome(); });
-  // Show on load
-  setTimeout(() => welcomeOverlay.classList.add('open'), 200);
+  // Show after page fully loads
+  window.addEventListener('load', () => setTimeout(() => welcomeOverlay.classList.add('open'), 300));
 </script>
 </body>
 </html>
