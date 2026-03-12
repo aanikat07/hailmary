@@ -557,7 +557,7 @@ function renderBattle() {
       <div style="margin-bottom:12px;padding:14px 16px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);line-height:1.9">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--text);margin-bottom:8px">HOW TO READ THIS CURVE</div>
         This curve shows every possible score difference between your lineup and theirs on game day. <span style="color:#00e5a0;font-weight:600">Green</span> = outcomes where you win (D &gt; 0). <span style="color:#4da6ff;font-weight:600">Blue</span> = outcomes where they win (D &lt; 0). The dashed line at 0 is the win/loss threshold.<br><br>
-        A <strong>wider curve</strong> means more combined variance — even with a projected edge, a big chunk can bleed into losing territory. A <strong>narrower curve</strong> means a more predictable game. If you're the underdog, you want a wide curve — variance is your only path to an upset.
+        A <strong>wider curve</strong> means more combined variance — even if you're projected to win, a wide curve means a large portion of possible outcomes still land in losing territory, so the game is less certain than the win % alone suggests. A <strong>narrower curve</strong> means a more predictable game. If you're the underdog, you want a wide curve — variance is your only path to an upset.
       </div>
 
       <canvas id="diff-canvas" style="height:120px"></canvas>
