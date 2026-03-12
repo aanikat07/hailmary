@@ -638,18 +638,22 @@ function renderMatchupCard(m, idx) {
   else                { edgeClass = 'edge-even'; edgeText = 'EVEN MATCHUP'; }
 
   let insight = '';
+  const myName  = shortName(m.mine.name);
+  const oppName = shortName(m.opp.name);
+  const sigDiff = (oppMeta.weekSigma - myMeta.weekSigma).toFixed(1);
+  const myCeil  = myMeta.weekMu  + 1.5 * myMeta.weekSigma;
+  const oppCeil = oppMeta.weekMu + 1.5 * oppMeta.weekSigma;
+
   if (riskMode === 'safe') {
     if (myMeta.weekSigma < oppMeta.weekSigma)
-      insight = `Your ${shortName(m.mine.name)} is more consistent (σ=${myMeta.weekSigma.toFixed(1)} vs ${oppMeta.weekSigma.toFixed(1)}). Floor advantage.`;
+      insight = `✅ <strong>${myName}</strong> is the safer start — their scores are more predictable week to week. Even if they don't go off, they're less likely to disappoint.`;
     else
-      insight = `Their ${shortName(m.opp.name)} is more consistent (σ=${oppMeta.weekSigma.toFixed(1)}). Variance risk on your side.`;
+      insight = `⚠️ <strong>${oppName}</strong> has more consistent scores than yours. Your player carries more week-to-week risk — they could boom, but they could also underdeliver.`;
   } else {
-    const myCeil  = myMeta.weekMu  + 1.5 * myMeta.weekSigma;
-    const oppCeil = oppMeta.weekMu + 1.5 * oppMeta.weekSigma;
     if (myCeil > oppCeil)
-      insight = `${shortName(m.mine.name)} ceiling ${myCeil.toFixed(1)} vs ${oppCeil.toFixed(1)}. Upside advantage yours.`;
+      insight = `🚀 <strong>${myName}</strong> has the higher ceiling this week (${myCeil.toFixed(1)} vs ${oppCeil.toFixed(1)} projected). If they go off, this is a matchup you can win big.`;
     else
-      insight = `${shortName(m.opp.name)} has higher ceiling (${oppCeil.toFixed(1)} vs ${myCeil.toFixed(1)}). Watch out.`;
+      insight = `👀 <strong>${oppName}</strong> has a higher ceiling than your player (${oppCeil.toFixed(1)} vs ${myCeil.toFixed(1)}). They have more upside — consider whether your player can keep up.`;
   }
 
   return `
