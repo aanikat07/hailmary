@@ -582,6 +582,35 @@ function renderBattle() {
       </div>
     </div>
 
+    <div style="margin-bottom:20px;padding:24px 28px;background:rgba(255,255,255,0.025);border:1px solid var(--border);border-radius:14px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--text);margin-bottom:6px">How to read these cards</div>
+      <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.6">Each card compares one of your players head-to-head against their opponent at the same position. Here's what the labels actually mean and why they matter.</div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+        <div style="background:rgba(255,209,102,0.06);border:1px solid rgba(255,209,102,0.2);border-radius:10px;padding:16px 18px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:#ffd166;margin-bottom:8px">💥 BOOM/BUST</div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);line-height:1.7">This player's scores swing wildly week to week. Most apps just show you their average — we show you the risk. Start them when you're the underdog and need a big game. Bench them when you're favored and want a safe floor.</div>
+        </div>
+        <div style="background:rgba(0,229,160,0.06);border:1px solid rgba(0,229,160,0.2);border-radius:10px;padding:16px 18px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:#00e5a0;margin-bottom:8px">📊 CONSISTENT</div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);line-height:1.7">Week in, week out, this player shows up near their average — no huge surprises in either direction. The backbone of a safe lineup. When you're already favored, these players protect your lead.</div>
+        </div>
+        <div style="background:rgba(167,139,250,0.06);border:1px solid rgba(167,139,250,0.2);border-radius:10px;padding:16px 18px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:#a78bfa;margin-bottom:8px">🏰 FLOOR MONSTER</div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);line-height:1.7">Elite production AND low variance — the best of both worlds. Think a workhorse RB on a run-heavy team, or a dominant TE with no competition. Start them every week, no questions asked.</div>
+        </div>
+        <div style="background:rgba(248,113,113,0.06);border:1px solid rgba(248,113,113,0.2);border-radius:10px;padding:16px 18px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:#f87171;margin-bottom:8px">🚨 INJURY RISK</div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);line-height:1.7">This player has missed significant time this season, so their projection is based on fewer games and is less reliable. Check injury reports before locking them in — a DNP tanks your lineup.</div>
+        </div>
+      </div>
+
+      <div style="background:rgba(77,166,255,0.06);border:1px solid rgba(77,166,255,0.2);border-radius:10px;padding:18px 20px">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:#4da6ff;margin-bottom:10px">🔥 Boom % — what other apps don't tell you</div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);line-height:1.8">Most fantasy apps rank players by projected points. We also calculate the <span style="color:#4da6ff;font-weight:600">probability of a standout week</span> — the chance a player scores 1.5× their own seasonal average. When two players have similar projections, Boom % tells you which one has real upside and which one is just going to be "fine."<br><br><span style="color:var(--muted);font-size:12px">Estimated via logistic regression on 6 features: projected μ, σ, matchup difficulty, recent form, position, and games played. Model accuracy: 75.4% on held-out data.</span></div>
+      </div>
+    </div>
+
     <div class="risk-toggle">
       <div class="risk-label">RISK MODE — affects matchup priority</div>
       <button class="risk-btn ${riskMode === 'safe'   ? 'active-safe'   : ''}" data-risk="safe">SAFE — FLOOR</button>
@@ -595,44 +624,6 @@ function renderBattle() {
         ${sortedMatchups.map((m, idx) => renderMatchupCard(m, idx)).join('')}
       </div>
     </div>
-
-    <div style="margin-top:24px;padding:24px 28px;background:rgba(255,255,255,0.025);border:1px solid var(--border);border-radius:14px;">
-
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--text);margin-bottom:6px">How to read these cards</div>
-      <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.6">Each card compares one of your players head-to-head against their opponent at the same position. Here's what the labels actually mean and why they matter.</div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px">
-
-        <div style="background:rgba(255,209,102,0.06);border:1px solid rgba(255,209,102,0.2);border-radius:10px;padding:16px 18px">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:#ffd166;margin-bottom:8px">💥 BOOM/BUST</div>
-          <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);line-height:1.7">This player's scores swing wildly week to week. They might drop 30 points or get you 6. Most apps just show you their average — we show you the risk. Start them when you're the underdog and need a big game. Bench them when you're favored and need a safe floor.</div>
-        </div>
-
-        <div style="background:rgba(0,229,160,0.06);border:1px solid rgba(0,229,160,0.2);border-radius:10px;padding:16px 18px">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:#00e5a0;margin-bottom:8px">📊 CONSISTENT</div>
-          <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);line-height:1.7">Week in, week out, this player shows up near their average. You won't get a huge surprise — in either direction. The backbone of a safe lineup. When you're already favored to win, these players protect your lead by not blowing up.</div>
-        </div>
-
-        <div style="background:rgba(167,139,250,0.06);border:1px solid rgba(167,139,250,0.2);border-radius:10px;padding:16px 18px">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:#a78bfa;margin-bottom:8px">🏰 FLOOR MONSTER</div>
-          <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);line-height:1.7">Elite production AND low variance — the best of both worlds. These players almost never let you down. Think a workhorse RB on a run-heavy team, or a dominant TE with no competition. Start them every week, no questions asked.</div>
-        </div>
-
-        <div style="background:rgba(248,113,113,0.06);border:1px solid rgba(248,113,113,0.2);border-radius:10px;padding:16px 18px">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:#f87171;margin-bottom:8px">🚨 INJURY RISK</div>
-          <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);line-height:1.7">This player has missed significant time this season. Their projection is based on fewer games than normal, so it's less reliable. Check injury reports before locking them in — a DNP would tank your lineup.</div>
-        </div>
-
-      </div>
-
-      <div style="background:rgba(77,166,255,0.06);border:1px solid rgba(77,166,255,0.2);border-radius:10px;padding:18px 20px">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:#4da6ff;margin-bottom:10px">🔥 Boom % — what other apps don't tell you</div>
-        <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);line-height:1.8">
-          Most fantasy apps rank players by projected points. We also calculate the <span style="color:#4da6ff;font-weight:600">probability of a standout week</span> — specifically, the chance a player scores 1.5× their own seasonal average.<br><br>
-          This is useful when two players have similar projections but different upside. If you need to decide between a 40% boom player and a 18% boom player, the math is telling you one of them has a real shot at breaking out — and the other is likely to just be "fine."<br><br>
-          <span style="color:var(--muted);font-size:12px">Estimated via logistic regression on 6 features: projected μ, σ, matchup difficulty, recent form trend, position, and games played this season. Model accuracy: 75.4% on held-out data.</span>
-        </div>
-      </div>
 
     </div>` : ''}
   `;
