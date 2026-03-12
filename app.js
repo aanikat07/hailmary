@@ -596,31 +596,44 @@ function renderBattle() {
       </div>
     </div>
 
-    <div style="margin-top:18px;padding:14px 16px;background:rgba(255,255,255,0.025);border:1px solid var(--border);border-radius:10px;font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);line-height:2.1">
-      <div style="color:var(--text);font-weight:700;letter-spacing:1px;margin-bottom:10px">INTERPRETING ARCHETYPES &amp; BOOM PROBABILITY</div>
+    <div style="margin-top:24px;padding:24px 28px;background:rgba(255,255,255,0.025);border:1px solid var(--border);border-radius:14px;">
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 20px;">
-        <div>
-          <div style="color:#ffd166;font-weight:700;margin-bottom:3px">BOOM/BUST</div>
-          High ceiling, high floor variance. These players have big upside weeks but also goose-egg risk. Boom% will typically be elevated (&gt;35%). Use them when you need points — risky in safe-mode weeks.
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--text);margin-bottom:6px">How to read these cards</div>
+      <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.6">Each card compares one of your players head-to-head against their opponent at the same position. Here's what the labels actually mean and why they matter.</div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px">
+
+        <div style="background:rgba(255,209,102,0.06);border:1px solid rgba(255,209,102,0.2);border-radius:10px;padding:16px 18px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:#ffd166;margin-bottom:8px">💥 BOOM/BUST</div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);line-height:1.7">This player's scores swing wildly week to week. They might drop 30 points or get you 6. Most apps just show you their average — we show you the risk. Start them when you're the underdog and need a big game. Bench them when you're favored and need a safe floor.</div>
         </div>
-        <div>
-          <div style="color:#00e5a0;font-weight:700;margin-bottom:3px">CONSISTENT</div>
-          Low σ relative to μ. These players show up every week near their average. Boom% is typically lower (&lt;25%) but their floor is reliable. The backbone of a safe-mode lineup.
+
+        <div style="background:rgba(0,229,160,0.06);border:1px solid rgba(0,229,160,0.2);border-radius:10px;padding:16px 18px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:#00e5a0;margin-bottom:8px">📊 CONSISTENT</div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);line-height:1.7">Week in, week out, this player shows up near their average. You won't get a huge surprise — in either direction. The backbone of a safe lineup. When you're already favored to win, these players protect your lead by not blowing up.</div>
         </div>
-        <div>
-          <div style="color:#f87171;font-weight:700;margin-bottom:3px">INJURY RISK</div>
-          Played in fewer than 60% of games this season. Their μ and σ are estimated from a thin sample — projections carry more uncertainty than normal. Factor in game-time decisions.
+
+        <div style="background:rgba(167,139,250,0.06);border:1px solid rgba(167,139,250,0.2);border-radius:10px;padding:16px 18px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:#a78bfa;margin-bottom:8px">🏰 FLOOR MONSTER</div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);line-height:1.7">Elite production AND low variance — the best of both worlds. These players almost never let you down. Think a workhorse RB on a run-heavy team, or a dominant TE with no competition. Start them every week, no questions asked.</div>
         </div>
-        <div>
-          <div style="color:#a78bfa;font-weight:700;margin-bottom:3px">FLOOR MONSTER</div>
-          High μ relative to σ — elite production with low bust risk. These are the best starts in safe-mode: you nearly always get close to their projection. Think workhorse RBs or dominant TEs.
+
+        <div style="background:rgba(248,113,113,0.06);border:1px solid rgba(248,113,113,0.2);border-radius:10px;padding:16px 18px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:#f87171;margin-bottom:8px">🚨 INJURY RISK</div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);line-height:1.7">This player has missed significant time this season. Their projection is based on fewer games than normal, so it's less reliable. Check injury reports before locking them in — a DNP would tank your lineup.</div>
         </div>
-        <div style="grid-column:1/-1">
-          <div style="color:var(--text);font-weight:700;margin-bottom:3px">BOOM % — what it means</div>
-          Boom probability is estimated via logistic regression on 6 features: current μ, σ, opponent defensive rank, recent trend, position, and games played. It represents the model's estimated probability that the player scores <strong style="color:var(--text)">≥ 1.5× their seasonal μ</strong> this week. A 40% boom means roughly 2-in-5 chance of a standout performance. Use this to compare upside between two similar-μ players when you need a ceiling play.
+
+      </div>
+
+      <div style="background:rgba(77,166,255,0.06);border:1px solid rgba(77,166,255,0.2);border-radius:10px;padding:18px 20px">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:#4da6ff;margin-bottom:10px">🔥 Boom % — what other apps don't tell you</div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);line-height:1.8">
+          Most fantasy apps rank players by projected points. We also calculate the <span style="color:#4da6ff;font-weight:600">probability of a standout week</span> — specifically, the chance a player scores 1.5× their own seasonal average.<br><br>
+          This is useful when two players have similar projections but different upside. If you need to decide between a 40% boom player and a 18% boom player, the math is telling you one of them has a real shot at breaking out — and the other is likely to just be "fine."<br><br>
+          <span style="color:var(--muted);font-size:12px">Estimated via logistic regression on 6 features: projected μ, σ, matchup difficulty, recent form trend, position, and games played this season. Model accuracy: 75.4% on held-out data.</span>
         </div>
       </div>
+
     </div>` : ''}
   `;
 
