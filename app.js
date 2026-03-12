@@ -22,37 +22,37 @@ const SLOTS = [
 const DEF_RANKINGS = {
   QB: {
     ARI:1, NO:2, CAR:3, NYJ:4, LV:5, CLE:6, TEN:7, DEN:8, MIA:9, LAC:10,
-    JAC:11, NE:12, CHI:13, SEA:14, ATL:15, WAS:16, DAL:17, MIN:18, IND:19, NYG:20,
+    JAC:11, NE:12, CHI:13, SEA:14, ATL:15, WSH:16, DAL:17, MIN:18, IND:19, NYG:20,
     CIN:21, HOU:22, TB:23, PHI:24, GB:25, DET:26, BAL:27, LAR:28, BUF:29, SF:30,
     PIT:31, KC:32
   },
   RB: {
     MIA:1, NO:2, CAR:3, ATL:4, TEN:5, ARI:6, NYG:7, CLE:8, NYJ:9, LV:10,
-    JAC:11, WAS:12, DEN:13, CHI:14, LAC:15, SEA:16, CIN:17, MIN:18, DAL:19, GB:20,
+    JAC:11, WSH:12, DEN:13, CHI:14, LAC:15, SEA:16, CIN:17, MIN:18, DAL:19, GB:20,
     IND:21, NE:22, TB:23, DET:24, HOU:25, PHI:26, LAR:27, BAL:28, PIT:29, BUF:30,
     SF:31, KC:32
   },
   WR: {
     CAR:1, TEN:2, ARI:3, NO:4, NYJ:5, MIA:6, LV:7, CLE:8, CIN:9, JAC:10,
-    ATL:11, CHI:12, WAS:13, LAC:14, DAL:15, NYG:16, SEA:17, DEN:18, MIN:19, IND:20,
+    ATL:11, CHI:12, WSH:13, LAC:14, DAL:15, NYG:16, SEA:17, DEN:18, MIN:19, IND:20,
     NE:21, TB:22, GB:23, HOU:24, DET:25, BAL:26, PHI:27, LAR:28, BUF:29, PIT:30,
     SF:31, KC:32
   },
   TE: {
     CAR:1, ARI:2, MIA:3, TEN:4, CHI:5, ATL:6, NO:7, NYJ:8, CLE:9, LV:10,
-    JAC:11, DEN:12, CIN:13, WAS:14, DAL:15, NYG:16, SEA:17, IND:18, MIN:19, LAC:20,
+    JAC:11, DEN:12, CIN:13, WSH:14, DAL:15, NYG:16, SEA:17, IND:18, MIN:19, LAC:20,
     NE:21, GB:22, DET:23, HOU:24, TB:25, PHI:26, BAL:27, LAR:28, BUF:29, PIT:30,
     SF:31, KC:32
   },
   K: {
     CAR:1, TEN:2, ARI:3, NO:4, MIA:5, NYJ:6, LV:7, CLE:8, ATL:9, CHI:10,
-    JAC:11, CIN:12, DEN:13, WAS:14, DAL:15, NYG:16, LAC:17, SEA:18, MIN:19, IND:20,
+    JAC:11, CIN:12, DEN:13, WSH:14, DAL:15, NYG:16, LAC:17, SEA:18, MIN:19, IND:20,
     NE:21, TB:22, GB:23, HOU:24, DET:25, PHI:26, BAL:27, LAR:28, BUF:29, PIT:30,
     SF:31, KC:32
   },
   DST: {
     MIA:1, ARI:2, CAR:3, TEN:4, NO:5, NYJ:6, CLE:7, LV:8, JAC:9, ATL:10,
-    CHI:11, DEN:12, WAS:13, CIN:14, LAC:15, NYG:16, DAL:17, SEA:18, MIN:19, IND:20,
+    CHI:11, DEN:12, WSH:13, CIN:14, LAC:15, NYG:16, DAL:17, SEA:18, MIN:19, IND:20,
     NE:21, GB:22, DET:23, HOU:24, TB:25, PHI:26, BAL:27, LAR:28, BUF:29, PIT:30,
     SF:31, KC:32
   }
@@ -562,9 +562,17 @@ function renderBattle() {
     </div>
 
     <div class="risk-toggle">
-      <div class="risk-label">RISK MODE — affects matchup priority</div>
-      <button class="risk-btn ${riskMode === 'safe'   ? 'active-safe'   : ''}" data-risk="safe">SAFE — FLOOR</button>
-      <button class="risk-btn ${riskMode === 'upside' ? 'active-upside' : ''}" data-risk="upside">UPSIDE — CEILING</button>
+      <div>
+        <div class="risk-label">RISK MODE — affects matchup priority</div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:12px;color:var(--muted);margin-top:4px;line-height:1.6">
+          <span style="color:var(--green);font-weight:600">SAFE — FLOOR</span>: prioritizes your most consistent players — the ones least likely to disappoint. Best when you're already favored to win.<br>
+          <span style="color:#ffd166;font-weight:600">UPSIDE — CEILING</span>: prioritizes your highest-ceiling players — the ones who could go off. Best when you're the underdog and need a big week.
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-shrink:0;align-items:center">
+        <button class="risk-btn ${riskMode === 'safe'   ? 'active-safe'   : ''}" data-risk="safe">SAFE — FLOOR</button>
+        <button class="risk-btn ${riskMode === 'upside' ? 'active-upside' : ''}" data-risk="upside">UPSIDE — CEILING</button>
+      </div>
     </div>
 
     ${sortedMatchups.length > 0 ? `
